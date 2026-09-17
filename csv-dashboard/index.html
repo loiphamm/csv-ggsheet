@@ -1,1269 +1,3327 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CSV Analytics Dashboard – Telesale</title>
-  <meta name="description" content="Phân tích dữ liệu Telesale từ file CSV xuất từ Google Sheets. Phân 4 nhóm trạng thái, lọc theo ngày, nhân viên, biểu đồ trực quan." />
+  <meta name="description"
+    content="Phân tích dữ liệu Telesale từ file CSV xuất từ Google Sheets. Phân 4 nhóm trạng thái, lọc theo ngày, nhân viên, biểu đồ trực quan." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --primary: #6366f1; --primary-light: #818cf8; --primary-dark: #4f46e5;
-      --primary-bg: #eef2ff; --success: #10b981; --success-bg: #d1fae5;
-      --warning: #f59e0b; --warning-bg: #fef3c7; --danger: #ef4444;
-      --danger-bg: #fee2e2; --info: #3b82f6; --info-bg: #dbeafe;
-      --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
-      --gray-300:#d1d5db; --gray-400:#9ca3af; --gray-500:#6b7280;
-      --gray-600:#4b5563; --gray-700:#374151; --gray-800:#1f2937; --gray-900:#111827;
-      --white:#ffffff;
-      /* Group colors */
-      --g1-color:#059669; --g1-bg:#ecfdf5; --g1-border:#a7f3d0; --g1-badge:#10b981;
-      --g2-color:#2563eb; --g2-bg:#eff6ff; --g2-border:#bfdbfe; --g2-badge:#3b82f6;
-      --g3-color:#dc2626; --g3-bg:#fef2f2; --g3-border:#fecaca; --g3-badge:#ef4444;
-      --g4-color:#4b5563; --g4-bg:#f9fafb; --g4-border:#e5e7eb; --g4-badge:#6b7280;
-      --radius-sm:8px; --radius:12px; --radius-lg:16px; --radius-xl:20px;
-      --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-      --shadow:0 4px 6px -1px rgba(0,0,0,.07),0 2px 4px -1px rgba(0,0,0,.04);
-      --shadow-md:0 10px 15px -3px rgba(0,0,0,.08),0 4px 6px -2px rgba(0,0,0,.04);
-      --shadow-lg:0 20px 25px -5px rgba(0,0,0,.08),0 10px 10px -5px rgba(0,0,0,.03);
-      --transition:all .2s ease;
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    body { font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; background:#f0f4ff; color:var(--gray-800); min-height:100vh; font-size:14px; line-height:1.5; }
-    
+
+    :root {
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --primary-dark: #4f46e5;
+      --primary-bg: #eef2ff;
+      --success: #10b981;
+      --success-bg: #d1fae5;
+      --warning: #f59e0b;
+      --warning-bg: #fef3c7;
+      --danger: #ef4444;
+      --danger-bg: #fee2e2;
+      --info: #3b82f6;
+      --info-bg: #dbeafe;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --white: #ffffff;
+      /* Group colors */
+      --g1-color: #059669;
+      --g1-bg: #ecfdf5;
+      --g1-border: #a7f3d0;
+      --g1-badge: #10b981;
+      --g2-color: #2563eb;
+      --g2-bg: #eff6ff;
+      --g2-border: #bfdbfe;
+      --g2-badge: #3b82f6;
+      --g3-color: #dc2626;
+      --g3-bg: #fef2f2;
+      --g3-border: #fecaca;
+      --g3-badge: #ef4444;
+      --g4-color: #4b5563;
+      --g4-bg: #f9fafb;
+      --g4-border: #e5e7eb;
+      --g4-badge: #6b7280;
+      --radius-sm: 8px;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, .06), 0 1px 2px rgba(0, 0, 0, .04);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, .07), 0 2px 4px -1px rgba(0, 0, 0, .04);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, .08), 0 4px 6px -2px rgba(0, 0, 0, .04);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, .08), 0 10px 10px -5px rgba(0, 0, 0, .03);
+      --transition: all .2s ease;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f0f4ff;
+      color: var(--gray-800);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
     /* HEADER */
-    .header { background:var(--white); border-bottom:1px solid var(--gray-200); padding:0 24px; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; box-shadow:var(--shadow-sm); }
-    .header-left { display:flex; align-items:center; gap:12px; }
-    .header-logo { width:34px; height:34px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; color:white; box-shadow:0 2px 8px rgba(99,102,241,.3); }
-    .header-title { font-size:16px; font-weight:700; color:var(--gray-900); }
-    .header-subtitle { font-size:12px; color:var(--gray-400); margin-left:6px; font-weight:400; }
-    .header-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-    .file-badge { display:flex; align-items:center; gap:8px; background:var(--primary-bg); border:1px solid #c7d2fe; border-radius:20px; padding:4px 14px; font-size:12px; font-weight:500; color:var(--primary-dark); max-width:240px; }
-    .file-badge span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: white;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, .3);
+    }
+
+    .header-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .header-subtitle {
+      font-size: 12px;
+      color: var(--gray-400);
+      margin-left: 6px;
+      font-weight: 400;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .file-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-bg);
+      border: 1px solid #c7d2fe;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--primary-dark);
+      max-width: 240px;
+    }
+
+    .file-badge span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     /* BUTTONS */
-    .btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:var(--radius-sm); font-size:13px; font-weight:500; cursor:pointer; border:none; transition:var(--transition); text-decoration:none; white-space:nowrap; font-family:inherit; position:relative; overflow:hidden; isolation:isolate; }
-    .btn::before { content:''; position:absolute; left:-160%; top:0; width:40%; height:100%; background:linear-gradient(120deg,transparent,rgba(255,255,255,.82),transparent); transform:skewX(-25deg); opacity:0; transition:left .7s ease, opacity .4s ease; z-index:0; }
-    .btn:hover::before { left:160%; opacity:1; }
-    .btn > * { position:relative; z-index:1; }
-    .btn-primary { background:var(--primary); color:white; }
-    .btn-primary:hover { background:var(--primary-dark); transform:translateY(-1px); box-shadow:var(--shadow-md); }
-    .btn-secondary { background:var(--white); color:var(--gray-700); border:1px solid var(--gray-300); }
-    .btn-secondary:hover { background:var(--gray-50); border-color:var(--gray-400); }
-    .btn-success { background:var(--success); color:white; }
-    .btn-success:hover { background:#059669; transform:translateY(-1px); }
-    .btn-sm { padding:5px 12px; font-size:12px; }
-    .btn-pill { border-radius:20px; }
-    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      text-decoration: none;
+      white-space: nowrap;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      left: -160%;
+      top: 0;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, .82), transparent);
+      transform: skewX(-25deg);
+      opacity: 0;
+      transition: left .7s ease, opacity .4s ease;
+      z-index: 0;
+    }
+
+    .btn:hover::before {
+      left: 160%;
+      opacity: 1;
+    }
+
+    .btn>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--gray-700);
+      border: 1px solid var(--gray-300);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-50);
+      border-color: var(--gray-400);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 12px;
+    }
+
+    .btn-pill {
+      border-radius: 20px;
+    }
+
     /* UPLOAD SCREEN */
-    #upload-screen { min-height:calc(100vh - 60px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; background:linear-gradient(135deg,#f0f4ff 0%,#faf5ff 100%); }
-    .upload-hero { text-align:center; margin-bottom:36px; }
-    .upload-hero h1 { font-size:36px; font-weight:800; color:var(--gray-900); margin-bottom:12px; letter-spacing:-.5px; }
-    .upload-hero h1 span { background:linear-gradient(135deg,var(--primary),#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .upload-hero p { font-size:15px; color:var(--gray-500); max-width:520px; margin:0 auto; line-height:1.6; }
-    .drop-zone { width:100%; max-width:560px; background:var(--white); border:2px dashed var(--gray-300); border-radius:var(--radius-xl); padding:56px 40px; text-align:center; cursor:pointer; transition:var(--transition); position:relative; box-shadow:var(--shadow); overflow:hidden; isolation:isolate; }
-    .drop-zone::before { content:''; position:absolute; left:-160%; top:0; width:45%; height:100%; background:linear-gradient(120deg,transparent,rgba(255,255,255,.82),transparent); transform:skewX(-25deg); opacity:0; transition:left .8s ease, opacity .4s ease; z-index:0; }
-    .drop-zone::after { content:''; position:absolute; right:18px; top:12px; font-size:34px; color:#b78321; line-height:1; opacity:.95; filter:drop-shadow(0 0 8px rgba(183,131,33,.8)); transform:translateX(0) rotate(0deg); transition:transform .4s ease, color .4s ease; z-index:2; }
-    .drop-zone:hover::before, .drop-zone.drag-over::before { left:160%; opacity:1; }
-    .drop-zone:hover::after, .drop-zone.drag-over::after { color:#173f36; transform:translateX(-10px) rotate(12deg); }
-    .drop-zone > * { position:relative; z-index:1; }
-    .drop-zone:hover, .drop-zone.drag-over { border-color:var(--primary); background:var(--primary-bg); transform:scale(1.01); box-shadow:0 0 0 4px rgba(99,102,241,.12); }
-    .drop-zone.drag-over { border-style:solid; }
-    .drop-icon { width:118px; height:118px; margin:0 auto 14px; display:block; object-fit:contain; filter:drop-shadow(0 4px 12px rgba(23,63,54,.2)); }
-    .drop-zone h2 { font-size:18px; font-weight:700; color:var(--gray-900); margin-bottom:8px; }
-    .drop-zone p { font-size:13px; color:var(--gray-600); font-weight:600; margin-bottom:20px; }
-    #file-input { display:none; }
-    .upload-features { display:flex; gap:16px; margin-top:36px; flex-wrap:wrap; justify-content:center; }
-    .upload-feature { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--gray-600); background:white; padding:8px 16px; border-radius:20px; box-shadow:var(--shadow-sm); border:1px solid var(--gray-200); }
-    
+    #upload-screen {
+      min-height: calc(100vh - 60px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 100%);
+    }
+
+    .upload-hero {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .upload-hero h1 {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 12px;
+      letter-spacing: -.5px;
+    }
+
+    .upload-hero h1 span {
+      background: linear-gradient(135deg, var(--primary), #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .upload-hero p {
+      font-size: 15px;
+      color: var(--gray-500);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .drop-zone {
+      width: 100%;
+      max-width: 560px;
+      background: var(--white);
+      border: 2px dashed var(--gray-300);
+      border-radius: var(--radius-xl);
+      padding: 56px 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .drop-zone::before {
+      content: '';
+      position: absolute;
+      left: -160%;
+      top: 0;
+      width: 45%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, .82), transparent);
+      transform: skewX(-25deg);
+      opacity: 0;
+      transition: left .8s ease, opacity .4s ease;
+      z-index: 0;
+    }
+
+    .drop-zone::after {
+      content: '';
+      position: absolute;
+      right: 18px;
+      top: 12px;
+      font-size: 34px;
+      color: #b78321;
+      line-height: 1;
+      opacity: .95;
+      filter: drop-shadow(0 0 8px rgba(183, 131, 33, .8));
+      transform: translateX(0) rotate(0deg);
+      transition: transform .4s ease, color .4s ease;
+      z-index: 2;
+    }
+
+    .drop-zone:hover::before,
+    .drop-zone.drag-over::before {
+      left: 160%;
+      opacity: 1;
+    }
+
+    .drop-zone:hover::after,
+    .drop-zone.drag-over::after {
+      color: #173f36;
+      transform: translateX(-10px) rotate(12deg);
+    }
+
+    .drop-zone>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag-over {
+      border-color: var(--primary);
+      background: var(--primary-bg);
+      transform: scale(1.01);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, .12);
+    }
+
+    .drop-zone.drag-over {
+      border-style: solid;
+    }
+
+    .drop-icon {
+      width: 118px;
+      height: 118px;
+      margin: 0 auto 14px;
+      display: block;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 12px rgba(23, 63, 54, .2));
+    }
+
+    .drop-zone h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+    }
+
+    .drop-zone p {
+      font-size: 13px;
+      color: var(--gray-600);
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    .upload-features {
+      display: flex;
+      gap: 16px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .upload-feature {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--gray-600);
+      background: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-200);
+    }
+
     /* MAPPER */
-    #mapper-screen { min-height:calc(100vh - 60px); display:flex; align-items:center; justify-content:center; padding:40px 20px; background:linear-gradient(135deg,#f0f4ff 0%,#faf5ff 100%); }
-    .mapper-card { background:var(--white); border-radius:var(--radius-xl); padding:36px; max-width:540px; width:100%; box-shadow:var(--shadow-lg); }
-    .mapper-card h2 { font-size:20px; font-weight:700; margin-bottom:8px; color:var(--gray-900); }
-    .mapper-card > p { font-size:13px; color:var(--gray-500); margin-bottom:24px; line-height:1.5; }
-    .mapper-field { margin-bottom:18px; }
-    .mapper-field label { display:block; font-size:13px; font-weight:600; color:var(--gray-700); margin-bottom:6px; }
-    .mapper-field select { width:100%; padding:10px 36px 10px 14px; border:1px solid var(--gray-300); border-radius:var(--radius-sm); font-size:14px; color:var(--gray-800); background:var(--white); cursor:pointer; transition:var(--transition); appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; font-family:inherit; }
-    .mapper-field select:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(99,102,241,.15); }
-    
+    #mapper-screen {
+      min-height: calc(100vh - 60px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 100%);
+    }
+
+    .mapper-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      max-width: 540px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .mapper-card h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--gray-900);
+    }
+
+    .mapper-card>p {
+      font-size: 13px;
+      color: var(--gray-500);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .mapper-field {
+      margin-bottom: 18px;
+    }
+
+    .mapper-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+
+    .mapper-field select {
+      width: 100%;
+      padding: 10px 36px 10px 14px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      color: var(--gray-800);
+      background: var(--white);
+      cursor: pointer;
+      transition: var(--transition);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      font-family: inherit;
+    }
+
+    .mapper-field select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, .15);
+    }
+
     /* LOADING & ERROR */
-    #loading-screen { position:fixed; inset:0; background:rgba(255,255,255,.94); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1000; }
-    .spinner { width:46px; height:46px; border:4px solid var(--gray-200); border-top-color:var(--primary); border-radius:50%; animation:spin .8s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    #loading-screen p { margin-top:16px; font-size:14px; color:var(--gray-600); font-weight:500; }
-    .error-bar { background:var(--danger-bg); border-left:4px solid var(--danger); color:#991b1b; padding:12px 20px; border-radius:var(--radius-sm); display:flex; align-items:center; gap:10px; font-size:13px; font-weight:500; margin-top:16px; max-width:560px; }
-    
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, .94);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .spinner {
+      width: 46px;
+      height: 46px;
+      border: 4px solid var(--gray-200);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #loading-screen p {
+      margin-top: 16px;
+      font-size: 14px;
+      color: var(--gray-600);
+      font-weight: 500;
+    }
+
+    .error-bar {
+      background: var(--danger-bg);
+      border-left: 4px solid var(--danger);
+      color: #991b1b;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 16px;
+      max-width: 560px;
+    }
+
     /* DASHBOARD */
-    #dashboard-screen { min-height:calc(100vh - 60px); padding-bottom:40px; }
-    .container { max-width:1440px; margin:0 auto; padding:0 24px; }
-    
+    #dashboard-screen {
+      min-height: calc(100vh - 60px);
+      padding-bottom: 40px;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
     /* TOP STATS CARDS */
-    .cards-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; padding:20px 0 0; }
-    @media(max-width:960px) { .cards-grid { grid-template-columns:repeat(2,1fr); } }
-    @media(max-width:540px) { .cards-grid { grid-template-columns:1fr; } }
-    .card { background:var(--white); border-radius:var(--radius-lg); padding:18px 22px; box-shadow:var(--shadow-sm); border:1px solid var(--gray-100); transition:var(--transition); position:relative; overflow:hidden; }
-    .card:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); }
-    .card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
-    .card-primary::before { background:linear-gradient(90deg,var(--primary),var(--primary-light)); }
-    .card-success::before { background:linear-gradient(90deg,var(--success),#34d399); }
-    .card-warning::before { background:linear-gradient(90deg,var(--warning),#fbbf24); }
-    .card-info::before { background:linear-gradient(90deg,var(--info),#60a5fa); }
-    .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-    .card-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.8px; color:var(--gray-400); }
-    .card-icon { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:17px; }
-    .card-icon-primary { background:var(--primary-bg); }
-    .card-icon-success { background:var(--success-bg); }
-    .card-icon-warning { background:var(--warning-bg); }
-    .card-icon-info { background:var(--info-bg); }
-    .card-value { font-size:26px; font-weight:800; color:var(--gray-900); line-height:1.2; }
-    .card-sub { font-size:12px; color:var(--gray-400); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding: 20px 0 0;
+    }
+
+    @media(max-width:960px) {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media(max-width:540px) {
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-100);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .card-primary::before {
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    }
+
+    .card-success::before {
+      background: linear-gradient(90deg, var(--success), #34d399);
+    }
+
+    .card-warning::before {
+      background: linear-gradient(90deg, var(--warning), #fbbf24);
+    }
+
+    .card-info::before {
+      background: linear-gradient(90deg, var(--info), #60a5fa);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--gray-400);
+    }
+
+    .card-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+
+    .card-icon-primary {
+      background: var(--primary-bg);
+    }
+
+    .card-icon-success {
+      background: var(--success-bg);
+    }
+
+    .card-icon-warning {
+      background: var(--warning-bg);
+    }
+
+    .card-icon-info {
+      background: var(--info-bg);
+    }
+
+    .card-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--gray-900);
+      line-height: 1.2;
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--gray-400);
+      margin-top: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     /* 4 STATUS GROUP SELECTOR CARDS */
-    .group-section { margin-top:20px; }
-    .group-section-title { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--gray-500); margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
-    .group-cards-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
-    @media(max-width:960px) { .group-cards-grid { grid-template-columns:repeat(2,1fr); } }
-    @media(max-width:540px) { .group-cards-grid { grid-template-columns:1fr; } }
-    
-    .group-card { background:var(--white); border-radius:var(--radius); padding:16px 18px; border:2px solid transparent; box-shadow:var(--shadow-sm); cursor:pointer; transition:var(--transition); position:relative; user-select:none; }
-    .group-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
-    .group-card.active { border-color:currentColor; box-shadow:0 0 0 3px rgba(99,102,241,.15), var(--shadow-md); }
-    .group-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-    .group-badge { font-size:11px; font-weight:700; padding:2px 8px; border-radius:12px; display:inline-flex; align-items:center; gap:4px; }
-    .group-card-name { font-size:14px; font-weight:700; color:var(--gray-900); margin-bottom:4px; display:flex; align-items:center; gap:6px; }
-    .group-card-sub { font-size:11px; color:var(--gray-400); line-height:1.4; height:28px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
-    .group-card-stats { display:flex; align-items:baseline; justify-content:space-between; margin-top:10px; padding-top:10px; border-top:1px dashed var(--gray-200); }
-    .group-card-count { font-size:22px; font-weight:800; }
-    .group-card-pct { font-size:13px; font-weight:700; }
-    .group-check { width:18px; height:18px; border-radius:50%; display:none; align-items:center; justify-content:center; font-size:10px; color:white; }
-    .group-card.active .group-check { display:flex; }
+    .group-section {
+      margin-top: 20px;
+    }
+
+    .group-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--gray-500);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .group-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    @media(max-width:960px) {
+      .group-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media(max-width:540px) {
+      .group-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .group-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      border: 2px solid transparent;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      user-select: none;
+    }
+
+    .group-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .group-card.active {
+      border-color: currentColor;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, .15), var(--shadow-md);
+    }
+
+    .group-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .group-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .group-card-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .group-card-sub {
+      font-size: 11px;
+      color: var(--gray-400);
+      line-height: 1.4;
+      height: 28px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .group-card-stats {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--gray-200);
+    }
+
+    .group-card-count {
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .group-card-pct {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .group-check {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: white;
+    }
+
+    .group-card.active .group-check {
+      display: flex;
+    }
 
     /* Specific Group styling */
-    .grp-g1 { border-color:var(--g1-border); }
-    .grp-g1.active { border-color:var(--g1-badge); color:var(--g1-color); background:#f0fdf4; }
-    .grp-g1 .group-badge { background:var(--g1-bg); color:var(--g1-color); border:1px solid var(--g1-border); }
-    .grp-g1 .group-card-count { color:var(--g1-color); }
-    .grp-g1 .group-card-pct { color:var(--g1-color); }
-    .grp-g1 .group-check { background:var(--g1-badge); }
+    .grp-g1 {
+      border-color: var(--g1-border);
+    }
 
-    .grp-g2 { border-color:var(--g2-border); }
-    .grp-g2.active { border-color:var(--g2-badge); color:var(--g2-color); background:#eff6ff; }
-    .grp-g2 .group-badge { background:var(--g2-bg); color:var(--g2-color); border:1px solid var(--g2-border); }
-    .grp-g2 .group-card-count { color:var(--g2-color); }
-    .grp-g2 .group-card-pct { color:var(--g2-color); }
-    .grp-g2 .group-check { background:var(--g2-badge); }
+    .grp-g1.active {
+      border-color: var(--g1-badge);
+      color: var(--g1-color);
+      background: #f0fdf4;
+    }
 
-    .grp-g3 { border-color:var(--g3-border); }
-    .grp-g3.active { border-color:var(--g3-badge); color:var(--g3-color); background:#fef2f2; }
-    .grp-g3 .group-badge { background:var(--g3-bg); color:var(--g3-color); border:1px solid var(--g3-border); }
-    .grp-g3 .group-card-count { color:var(--g3-color); }
-    .grp-g3 .group-card-pct { color:var(--g3-color); }
-    .grp-g3 .group-check { background:var(--g3-badge); }
+    .grp-g1 .group-badge {
+      background: var(--g1-bg);
+      color: var(--g1-color);
+      border: 1px solid var(--g1-border);
+    }
 
-    .grp-g4 { border-color:var(--g4-border); }
-    .grp-g4.active { border-color:var(--g4-badge); color:var(--g4-color); background:#f3f4f6; }
-    .grp-g4 .group-badge { background:var(--g4-bg); color:var(--g4-color); border:1px solid var(--g4-border); }
-    .grp-g4 .group-card-count { color:var(--g4-color); }
-    .grp-g4 .group-card-pct { color:var(--g4-color); }
-    .grp-g4 .group-check { background:var(--g4-badge); }
-    
-    /* FILTERS CARD */
-    .filters-card { background:var(--white); border-radius:var(--radius-lg); padding:18px 22px; margin-top:20px; box-shadow:var(--shadow-sm); border:1px solid var(--gray-100); }
-    .filters-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-    .filters-title { font-size:14px; font-weight:700; color:var(--gray-800); display:flex; align-items:center; gap:8px; }
-    .filters-row { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
-    .filter-group { display:flex; flex-direction:column; gap:5px; min-width:140px; }
-    .filter-group label { font-size:12px; font-weight:600; color:var(--gray-600); }
-    .filter-input, .filter-select { padding:8px 12px; border:1px solid var(--gray-300); border-radius:var(--radius-sm); font-size:13px; color:var(--gray-800); background:var(--white); transition:var(--transition); font-family:inherit; }
-    .filter-select { appearance:none; padding-right:32px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; cursor:pointer; }
-    .filter-input:focus, .filter-select:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(99,102,241,.12); }
-    
-    .active-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px; padding-top:12px; border-top:1px solid var(--gray-100); }
-    .active-filters-label { font-size:12px; color:var(--gray-400); font-weight:600; }
-    .filter-badge { display:inline-flex; align-items:center; gap:6px; background:var(--primary-bg); color:var(--primary-dark); font-size:12px; font-weight:500; padding:3px 10px; border-radius:14px; border:1px solid #c7d2fe; cursor:pointer; }
-    .filter-badge:hover { background:#dbeafe; }
-    .filter-badge span { font-weight:700; font-size:13px; margin-left:2px; }
-    
+    .grp-g1 .group-card-count {
+      color: var(--g1-color);
+    }
+
+    .grp-g1 .group-card-pct {
+      color: var(--g1-color);
+    }
+
+    .grp-g1 .group-check {
+      background: var(--g1-badge);
+    }
+
+    .grp-g2 {
+      border-color: var(--g2-border);
+    }
+
+    .grp-g2.active {
+      border-color: var(--g2-badge);
+      color: var(--g2-color);
+      background: #eff6ff;
+    }
+
+    .grp-g2 .group-badge {
+      background: var(--g2-bg);
+      color: var(--g2-color);
+      border: 1px solid var(--g2-border);
+    }
+
+    .grp-g2 .group-card-count {
+      color: var(--g2-color);
+    }
+
+    .grp-g2 .group-card-pct {
+      color: var(--g2-color);
+    }
+
+    .grp-g2 .group-check {
+      background: var(--g2-badge);
+    }
+
+    .grp-g3 {
+      border-color: var(--g3-border);
+    }
+
+    .grp-g3.active {
+      border-color: var(--g3-badge);
+      color: var(--g3-color);
+      background: #fef2f2;
+    }
+
+    .grp-g3 .group-badge {
+      background: var(--g3-bg);
+      color: var(--g3-color);
+      border: 1px solid var(--g3-border);
+    }
+
+    .grp-g3 .group-card-count {
+      color: var(--g3-color);
+    }
+
+    .grp-g3 .group-card-pct {
+      color: var(--g3-color);
+    }
+
+    .grp-g3 .group-check {
+      background: var(--g3-badge);
+    }
+
+    .grp-g4 {
+      border-color: var(--g4-border);
+    }
+
+    .grp-g4.active {
+      border-color: var(--g4-badge);
+      color: var(--g4-color);
+      background: #f3f4f6;
+    }
+
+    .grp-g4 .group-badge {
+      background: var(--g4-bg);
+      color: var(--g4-color);
+      border: 1px solid var(--g4-border);
+    }
+
+    .grp-g4 .group-card-count {
+      color: var(--g4-color);
+    }
+
+    .grp-g4 .group-card-pct {
+      color: var(--g4-color);
+    }
+
+    .grp-g4 .group-check {
+      background: var(--g4-badge);
+    }
+
+    /* FILTERS BAR CARD */
+    .filters-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      margin-top: 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-100);
+    }
+
+    .filters-bar-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .filters-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn-filter-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: var(--radius);
+      background: var(--white);
+      border: 1.5px solid var(--primary);
+      color: var(--primary-dark);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 1px 3px rgba(99, 102, 241, .12);
+      font-family: inherit;
+    }
+
+    .btn-filter-trigger:hover {
+      background: var(--primary-bg);
+      border-color: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(99, 102, 241, .18);
+    }
+
+    .btn-filter-trigger:active {
+      transform: translateY(0);
+    }
+
+    .btn-filter-trigger.has-active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(99, 102, 241, .3);
+    }
+
+    .btn-filter-trigger.has-active:hover {
+      background: var(--primary-dark);
+    }
+
+    .filter-trigger-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 800;
+      background: white;
+      color: var(--primary-dark);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .15);
+    }
+
+    .btn-filter-trigger:not(.has-active) .filter-trigger-badge {
+      background: var(--primary-bg);
+      color: var(--primary-dark);
+    }
+
+    .filter-summary-text {
+      font-size: 13px;
+      color: var(--gray-500);
+      font-weight: 500;
+    }
+
+    .filter-summary-text strong {
+      color: var(--gray-800);
+      font-weight: 600;
+    }
+
+    .active-filters {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    .active-filters-label {
+      font-size: 12px;
+      color: var(--gray-400);
+      font-weight: 600;
+    }
+
+    .filter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-bg);
+      color: var(--primary-dark);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 14px;
+      border: 1px solid #c7d2fe;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .filter-badge:hover {
+      background: #dbeafe;
+      border-color: #93c5fd;
+    }
+
+    .filter-badge span {
+      font-weight: 700;
+      font-size: 14px;
+      margin-left: 3px;
+      opacity: .7;
+    }
+
+    .filter-badge:hover span {
+      opacity: 1;
+    }
+
+    /* POPUP MODAL STYLES */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, .45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-dialog {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25);
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(.96) translateY(10px);
+      transition: transform .2s ease;
+      border: 1px solid var(--gray-100);
+    }
+
+    .modal-backdrop.open .modal-dialog {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--white);
+      position: relative;
+    }
+
+    .modal-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--gray-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-subtitle {
+      font-size: 12px;
+      color: var(--gray-400);
+    }
+
+    .modal-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: var(--gray-100);
+      color: var(--gray-500);
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      line-height: 1;
+    }
+
+    .modal-close-btn:hover {
+      background: var(--gray-200);
+      color: var(--gray-800);
+    }
+
+    .modal-body {
+      padding: 22px 24px 30px 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-filters-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .ms-form-group-full {
+      grid-column: span 2;
+    }
+
+    @media(max-width:640px) {
+      .modal-filters-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ms-form-group-full {
+        grid-column: span 1;
+      }
+
+      .modal-dialog {
+        max-height: 96vh;
+      }
+
+      .modal-body {
+        padding: 16px 16px 24px 16px;
+      }
+    }
+
+    .ms-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+
+    .ms-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gray-700);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* MULTI-SELECT DROPDOWN COMPONENT */
+    .ms-widget {
+      position: relative;
+      width: 100%;
+    }
+
+    .ms-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      font-size: 13px;
+      color: var(--gray-800);
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+      font-family: inherit;
+      text-align: left;
+      min-height: 40px;
+    }
+
+    .ms-trigger:hover {
+      border-color: var(--primary-light);
+      background: var(--gray-50);
+    }
+
+    .ms-widget.open .ms-trigger {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, .15);
+    }
+
+    .ms-trigger-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+      padding-right: 8px;
+      font-weight: 500;
+    }
+
+    .ms-trigger-text.is-all {
+      color: var(--gray-600);
+    }
+
+    .ms-trigger-text.is-selected {
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+
+    .ms-trigger-arrow {
+      font-size: 11px;
+      color: var(--gray-400);
+      transition: transform .2s ease;
+      flex-shrink: 0;
+    }
+
+    .ms-widget.open .ms-trigger-arrow {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    .ms-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+      padding: 8px 0 6px 0;
+      display: none;
+    }
+
+    .ms-widget.open .ms-dropdown {
+      display: block;
+      animation: fadeInDown .15s ease;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .ms-search-box {
+      padding: 0 10px 8px 10px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .ms-search-input {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--gray-800);
+      background: var(--gray-50);
+      outline: none;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .ms-search-input:focus {
+      background: white;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, .1);
+    }
+
+    .ms-options-list {
+      max-height: 210px;
+      overflow-y: auto;
+      padding: 6px 6px 2px 6px;
+    }
+
+    .ms-options-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .ms-options-list::-webkit-scrollbar-thumb {
+      background: var(--gray-300);
+      border-radius: 3px;
+    }
+
+    .ms-option-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--gray-700);
+      user-select: none;
+      transition: background .15s;
+    }
+
+    .ms-option-item:hover {
+      background: var(--gray-50);
+      color: var(--gray-900);
+    }
+
+    .ms-option-item.is-special {
+      font-weight: 700;
+      color: var(--primary-dark);
+      border-bottom: 1px solid var(--gray-100);
+      margin-bottom: 4px;
+      border-radius: 6px 6px 0 0;
+    }
+
+    .ms-option-item.selected {
+      background: var(--primary-bg);
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+
+    .ms-option-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex-shrink: 0;
+      margin: 0;
+    }
+
+    .ms-option-text {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Group styling in Status dropdown */
+    .ms-group-header {
+      padding: 8px 10px 4px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--gray-500);
+      background: var(--gray-50);
+      border-radius: 6px;
+      margin: 6px 0 2px 0;
+    }
+
+    .ms-group-check-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .ms-group-check-wrap input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .ms-child-item {
+      padding-left: 24px !important;
+    }
+
+    .ms-no-results {
+      text-align: center;
+      padding: 16px;
+      font-size: 12px;
+      color: var(--gray-400);
+    }
+
+    .modal-footer {
+      padding: 14px 24px;
+      border-top: 1px solid var(--gray-200);
+      background: var(--gray-50);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .modal-footer-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     /* PANELS */
-    .panel { background:var(--white); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); border:1px solid var(--gray-100); overflow:hidden; }
-    .panel-header { padding:14px 20px; border-bottom:1px solid var(--gray-100); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
-    .panel-title { font-size:14px; font-weight:700; color:var(--gray-800); display:flex; align-items:center; gap:6px; }
-    .panel-body { padding:20px; }
-    
-    .analytics-grid { display:grid; grid-template-columns:1fr 1.35fr; gap:20px; margin-top:20px; }
-    @media(max-width:960px) { .analytics-grid { grid-template-columns:1fr; } }
-    
+    .panel {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-100);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-800);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .panel-body {
+      padding: 20px;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    @media(max-width:960px) {
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* VIEW TOGGLE PILLS */
-    .view-toggle { display:inline-flex; background:var(--gray-100); padding:3px; border-radius:8px; gap:2px; }
-    .view-toggle-btn { padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; border:none; background:transparent; color:var(--gray-500); cursor:pointer; transition:var(--transition); font-family:inherit; }
-    .view-toggle-btn.active { background:white; color:var(--gray-800); box-shadow:0 1px 2px rgba(0,0,0,.08); }
-    
+    .view-toggle {
+      display: inline-flex;
+      background: var(--gray-100);
+      padding: 3px;
+      border-radius: 8px;
+      gap: 2px;
+    }
+
+    .view-toggle-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--gray-500);
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .view-toggle-btn.active {
+      background: white;
+      color: var(--gray-800);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .08);
+    }
+
     /* STATUS TABLE */
-    .status-table { width:100%; border-collapse:collapse; font-size:13px; }
-    .status-table th { padding:9px 14px; text-align:left; font-size:11px; font-weight:600; color:var(--gray-400); text-transform:uppercase; letter-spacing:.5px; background:var(--gray-50); border-bottom:1px solid var(--gray-200); }
-    .status-table td { padding:10px 14px; border-bottom:1px solid var(--gray-100); vertical-align:middle; }
-    .status-table tr:last-child td { border-bottom:none; }
-    .status-table tr:hover td { background:var(--gray-50); }
-    .color-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:8px; flex-shrink:0; }
-    .pct-bar-wrap { display:flex; align-items:center; gap:10px; }
-    .pct-bar-bg { flex:1; height:7px; background:var(--gray-100); border-radius:4px; overflow:hidden; min-width:60px; }
-    .pct-bar-fill { height:100%; border-radius:4px; transition:width .4s ease; }
-    .pct-text { font-size:12px; font-weight:600; color:var(--gray-600); min-width:44px; text-align:right; }
-    .status-badge { display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; white-space:nowrap; }
+    .status-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .status-table th {
+      padding: 9px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .status-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--gray-100);
+      vertical-align: middle;
+    }
+
+    .status-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-table tr:hover td {
+      background: var(--gray-50);
+    }
+
+    .color-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .pct-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pct-bar-bg {
+      flex: 1;
+      height: 7px;
+      background: var(--gray-100);
+      border-radius: 4px;
+      overflow: hidden;
+      min-width: 60px;
+    }
+
+    .pct-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width .4s ease;
+    }
+
+    .pct-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-600);
+      min-width: 44px;
+      text-align: right;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
 
     /* DAILY ANALYSIS SECTION */
-    .daily-section { margin-top:20px; }
-    .daily-table-wrap { overflow-x:auto; }
-    .daily-table { width:100%; border-collapse:collapse; font-size:13px; }
-    .daily-table th { padding:10px 14px; text-align:left; font-size:11px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:.5px; background:var(--gray-50); border-bottom:1px solid var(--gray-200); white-space:nowrap; }
-    .daily-table td { padding:11px 14px; border-bottom:1px solid var(--gray-100); vertical-align:middle; }
-    .daily-table tr:hover td { background:#f8fafc; }
-    .daily-table tr.active-date td { background:#eef2ff; font-weight:600; }
-    .btn-select-date { padding:3px 8px; font-size:11px; font-weight:600; border-radius:6px; border:1px solid var(--gray-300); background:white; cursor:pointer; transition:var(--transition); color:var(--gray-700); }
-    .btn-select-date:hover { background:var(--primary); color:white; border-color:var(--primary); }
-    .btn-select-date.active { background:var(--primary); color:white; border-color:var(--primary); }
-    
+    .daily-section {
+      margin-top: 20px;
+    }
+
+    .daily-table-wrap {
+      overflow-x: auto;
+    }
+
+    .daily-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .daily-table th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      white-space: nowrap;
+    }
+
+    .daily-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--gray-100);
+      vertical-align: middle;
+    }
+
+    .daily-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    .daily-table tr.active-date td {
+      background: #eef2ff;
+      font-weight: 600;
+    }
+
+    .btn-select-date {
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid var(--gray-300);
+      background: white;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--gray-700);
+    }
+
+    .btn-select-date:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .btn-select-date.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
     /* DONUT CHART */
-    .chart-legend { display:grid; grid-template-columns:repeat(2,1fr); gap:6px 14px; margin-top:16px; width:100%; max-width:320px; }
-    .legend-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--gray-600); }
-    .legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-    
+    .chart-legend {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 14px;
+      margin-top: 16px;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--gray-600);
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
     /* DATA TABLE */
-    .data-panel { background:var(--white); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); border:1px solid var(--gray-100); overflow:hidden; margin-top:20px; }
-    .data-table-wrap { overflow-x:auto; max-height:560px; position:relative; }
-    .data-table { width:100%; border-collapse:collapse; font-size:13px; }
-    .data-table th { padding:10px 14px; text-align:left; font-size:11px; font-weight:600; color:var(--gray-500); text-transform:uppercase; letter-spacing:.5px; background:var(--gray-50); border-bottom:1px solid var(--gray-200); position:sticky; top:0; z-index:10; white-space:nowrap; cursor:pointer; user-select:none; }
-    .data-table th:hover { background:var(--gray-100); color:var(--gray-800); }
-    .data-table th.sort-asc::after { content:' ↑'; color:var(--primary); }
-    .data-table th.sort-desc::after { content:' ↓'; color:var(--primary); }
-    .data-table td { padding:9px 14px; border-bottom:1px solid var(--gray-100); white-space:nowrap; max-width:260px; overflow:hidden; text-overflow:ellipsis; }
-    .data-table tr:hover td { background:var(--gray-50); }
-    
+    .data-panel {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-100);
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    .data-table-wrap {
+      overflow-x: auto;
+      max-height: 560px;
+      position: relative;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .data-table th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .data-table th:hover {
+      background: var(--gray-100);
+      color: var(--gray-800);
+    }
+
+    .data-table th.sort-asc::after {
+      content: ' ↑';
+      color: var(--primary);
+    }
+
+    .data-table th.sort-desc::after {
+      content: ' ↓';
+      color: var(--primary);
+    }
+
+    .data-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--gray-100);
+      white-space: nowrap;
+      max-width: 260px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .data-table tr:hover td {
+      background: var(--gray-50);
+    }
+
     /* PAGINATION */
-    .pagination { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-top:1px solid var(--gray-100); flex-wrap:wrap; gap:10px; font-size:12px; }
-    .pagination-controls { display:flex; gap:4px; align-items:center; }
-    .page-btn { padding:4px 10px; border-radius:6px; font-size:12px; border:1px solid var(--gray-300); background:var(--white); color:var(--gray-700); cursor:pointer; transition:var(--transition); font-family:inherit; }
-    .page-btn:hover:not(:disabled) { border-color:var(--primary); color:var(--primary); }
-    .page-btn.active { background:var(--primary); border-color:var(--primary); color:white; font-weight:600; }
-    .page-btn:disabled { opacity:.4; cursor:not-allowed; }
-    
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-top: 1px solid var(--gray-100);
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .page-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      border: 1px solid var(--gray-300);
+      background: var(--white);
+      color: var(--gray-700);
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .page-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .page-btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
     /* EMPTY & HIGHLIGHT */
-    .empty-state { text-align:center; padding:48px 20px; color:var(--gray-400); }
-    .empty-state-icon { font-size:42px; margin-bottom:10px; display:block; }
-    mark.hl { background:#fef08a; color:#854d0e; padding:1px 3px; border-radius:3px; }
-    .hidden { display:none !important; }
-    .tooltip { position:fixed; background:#1f2937; color:white; padding:8px 12px; border-radius:8px; font-size:12px; pointer-events:none; display:none; z-index:500; box-shadow:0 4px 12px rgba(0,0,0,.2); line-height:1.6; }
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--gray-400);
+    }
+
+    .empty-state-icon {
+      font-size: 42px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    mark.hl {
+      background: #fef08a;
+      color: #854d0e;
+      padding: 1px 3px;
+      border-radius: 3px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .tooltip {
+      position: fixed;
+      background: #1f2937;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      pointer-events: none;
+      display: none;
+      z-index: 500;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+      line-height: 1.6;
+    }
   </style>
 </head>
+
 <body>
 
-<!-- LOADING SCREEN -->
-<div id="loading-screen" class="hidden">
-  <div class="spinner"></div>
-  <p id="loading-msg">Đang phân tích dữ liệu...</p>
-</div>
+  <!-- LOADING SCREEN -->
+  <div id="loading-screen" class="hidden">
+    <div class="spinner"></div>
+    <p id="loading-msg">Đang phân tích dữ liệu...</p>
+  </div>
 
-<!-- TOOLTIP -->
-<div class="tooltip" id="tooltip"></div>
+  <!-- TOOLTIP -->
+  <div class="tooltip" id="tooltip"></div>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="header-left">
-    <div class="header-logo">📊</div>
-    <div>
-      <span class="header-title">CSV Analytics – Telesale Pro</span>
-      <span class="header-subtitle">| Phân 4 nhóm trạng thái & Phân tích ngày</span>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="header-logo">📊</div>
+      <div>
+        <span class="header-title">CSV Analytics – Telesale Pro</span>
+        <span class="header-subtitle">| Phân 4 nhóm trạng thái & Phân tích ngày</span>
+      </div>
+    </div>
+    <div class="header-right" id="header-right">
+      <div class="file-badge hidden" id="file-badge">
+        <span>📁</span>
+        <span id="file-name-display"></span>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="btn-new-upload">↑ Upload file mới</button>
+      <button class="btn btn-success btn-sm hidden" id="btn-export">⬇ Export báo cáo</button>
+    </div>
+  </header>
+
+  <!-- UPLOAD SCREEN -->
+  <div id="upload-screen">
+    <div class="upload-hero">
+      <h1>Phân tích dữ liệu Telesale<br><span>Chuẩn hoá 4 nhóm trạng thái</span></h1>
+      <p>Kéo thả file CSV từ Google Sheets vào đây. Hệ thống tự động phân loại 4 nhóm trạng thái (Nhu cầu cao, Tham
+        khảo, KNC, Khác) và phân tích sâu theo từng ngày.</p>
+    </div>
+    <div class="drop-zone" id="drop-zone" role="button" tabindex="0">
+      <img class="drop-icon" src="logo-maia.png.webp" alt="MAIA" />
+
+      <input type="file" id="file-input" accept=".csv" />
+    </div>
+    <div id="error-upload" class="hidden"></div>
+    <div class="upload-features">
+      <div class="upload-feature">🎯 4 Nhóm trạng thái thông minh</div>
+      <div class="upload-feature">📅 Phân tích chi tiết theo ngày</div>
+      <div class="upload-feature">🔒 Xử lý nội bộ trên trình duyệt</div>
     </div>
   </div>
-  <div class="header-right" id="header-right">
-    <div class="file-badge hidden" id="file-badge">
-      <span>📁</span>
-      <span id="file-name-display"></span>
-    </div>
-    <button class="btn btn-secondary btn-sm" id="btn-new-upload">↑ Upload file mới</button>
-    <button class="btn btn-success btn-sm hidden" id="btn-export">⬇ Export báo cáo</button>
-  </div>
-</header>
 
-<!-- UPLOAD SCREEN -->
-<div id="upload-screen">
-  <div class="upload-hero">
-    <h1>Phân tích dữ liệu Telesale<br><span>Chuẩn hoá 4 nhóm trạng thái</span></h1>
-    <p>Kéo thả file CSV từ Google Sheets vào đây. Hệ thống tự động phân loại 4 nhóm trạng thái (Nhu cầu cao, Tham khảo, KNC, Khác) và phân tích sâu theo từng ngày.</p>
-  </div>
-  <div class="drop-zone" id="drop-zone" role="button" tabindex="0">
-    <img class="drop-icon" src="logo-maia.png.webp" alt="MAIA" />
-    <input type="file" id="file-input" accept=".csv" />
-  </div>
-  <div id="error-upload" class="hidden"></div>
-  <div class="upload-features">
-    <div class="upload-feature">🎯 4 Nhóm trạng thái thông minh</div>
-    <div class="upload-feature">📅 Phân tích chi tiết theo ngày</div>
-    <div class="upload-feature">🔒 Xử lý nội bộ trên trình duyệt</div>
-  </div>
-</div>
-
-<!-- MAPPER SCREEN -->
-<div id="mapper-screen" class="hidden">
-  <div class="mapper-card">
-    <h2>🔧 Chọn cột dữ liệu tương ứng</h2>
-    <p>Hệ thống tự động quét các cột trong file CSV của bạn. Vui lòng kiểm tra và xác nhận các cột chính:</p>
-    <div class="mapper-field">
-      <label>👤 Cột Nhân viên (Nguồn lead) *</label>
-      <select id="map-source"><option value="">— Chọn cột —</option></select>
-    </div>
-    <div class="mapper-field">
-      <label>�️ Cột Dịch vụ (tùy chọn)</label>
-      <select id="map-service"><option value="">(Không chọn / Tự động)</option></select>
-    </div>
-    <div class="mapper-field">
-      <label>�📋 Cột Trạng thái *</label>
-      <select id="map-status"><option value="">— Chọn cột —</option></select>
-    </div>
-    <div class="mapper-field">
-      <label>📅 Cột Ngày tiếp nhận (tự động kế thừa ô gộp)</label>
-      <select id="map-date"><option value="">(Không chọn / Tự động)</option></select>
-    </div>
-    <div class="mapper-field">
-      <label>⏰ Cột Đặt lịch hẹn (tuỳ chọn)</label>
-      <select id="map-schedule"><option value="">(Không chọn)</option></select>
-    </div>
-    <div class="mapper-field">
-      <label>🏷️ Cột Họ tên khách hàng (tuỳ chọn)</label>
-      <select id="map-name"><option value="">(Không chọn)</option></select>
-    </div>
-    <div style="display:flex;gap:10px;margin-top:12px;">
-      <button class="btn btn-primary" id="btn-mapper-confirm" style="flex:1">Xác nhận & Mở Dashboard →</button>
-      <button class="btn btn-secondary" id="btn-mapper-back">← Quay lại</button>
+  <!-- MAPPER SCREEN -->
+  <div id="mapper-screen" class="hidden">
+    <div class="mapper-card">
+      <h2>🔧 Chọn cột dữ liệu tương ứng</h2>
+      <p>Hệ thống tự động quét các cột trong file CSV của bạn. Vui lòng kiểm tra và xác nhận các cột chính:</p>
+      <div class="mapper-field">
+        <label>👤 Cột Nhân viên (Nguồn lead) *</label>
+        <select id="map-source">
+          <option value="">— Chọn cột —</option>
+        </select>
+      </div>
+      <div class="mapper-field">
+        <label>�️ Cột Dịch vụ (tùy chọn)</label>
+        <select id="map-service">
+          <option value="">(Không chọn / Tự động)</option>
+        </select>
+      </div>
+      <div class="mapper-field">
+        <label>�📋 Cột Trạng thái *</label>
+        <select id="map-status">
+          <option value="">— Chọn cột —</option>
+        </select>
+      </div>
+      <div class="mapper-field">
+        <label>📅 Cột Ngày tiếp nhận (tự động kế thừa ô gộp)</label>
+        <select id="map-date">
+          <option value="">(Không chọn / Tự động)</option>
+        </select>
+      </div>
+      <div class="mapper-field">
+        <label>⏰ Cột Đặt lịch hẹn (tuỳ chọn)</label>
+        <select id="map-schedule">
+          <option value="">(Không chọn)</option>
+        </select>
+      </div>
+      <div class="mapper-field">
+        <label>🏷️ Cột Họ tên khách hàng (tuỳ chọn)</label>
+        <select id="map-name">
+          <option value="">(Không chọn)</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:12px;">
+        <button class="btn btn-primary" id="btn-mapper-confirm" style="flex:1">Xác nhận & Mở Dashboard →</button>
+        <button class="btn btn-secondary" id="btn-mapper-back">← Quay lại</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- DASHBOARD SCREEN -->
-<div id="dashboard-screen" class="hidden">
-  <div class="container">
-    
-    <!-- TOP STATS CARDS -->
-    <div class="cards-grid">
-      <div class="card card-primary">
-        <div class="card-header"><span class="card-label">Tổng khách hàng</span><div class="card-icon card-icon-primary">👥</div></div>
-        <div class="card-value" id="card-total">0</div>
-        <div class="card-sub">Kết quả lọc / Tổng: <span id="card-total-all">0</span></div>
-      </div>
-      <div class="card card-success">
-        <div class="card-header"><span class="card-label">Khách Hàng Đã Đến</span><div class="card-icon card-icon-success">🔥</div></div>
-        <div class="card-value" id="card-g1-pct">0%</div>
-        <div class="card-sub"><span id="card-g1-count">0</span> khách hàng đã đến / Trên Tổng: <span id="card-g1-total-all">0</span></div>
-      </div>
-      <div class="card card-warning">
-        <div class="card-header"><span class="card-label">Ngày đang lọc</span><div class="card-icon card-icon-warning">📅</div></div>
-        <div class="card-value" id="card-active-date" style="font-size:22px;">Tất cả</div>
-        <div class="card-sub" id="card-active-date-sub">Toàn bộ chiến dịch</div>
-      </div>
-      <div class="card card-info">
-        <div class="card-header"><span class="card-label">Nhân viên</span><div class="card-icon card-icon-info">👤</div></div>
-        <div class="card-value" id="card-sources">0</div>
-        <div class="card-sub">nhân sự phụ trách</div>
-      </div>
-    </div>
+  <!-- DASHBOARD SCREEN -->
+  <div id="dashboard-screen" class="hidden">
+    <div class="container">
 
-    <!-- 4 STATUS GROUPS INTERACTIVE SELECTOR -->
-    <div class="group-section">
-      <div class="group-section-title">
-        <span>🎯 4 Nhóm Trạng Thái (Bấm vào nhóm để lọc nhanh)</span>
-        <span id="group-clear-btn" style="cursor:pointer;color:var(--primary);text-transform:none;font-weight:600;display:none;">✕ Bỏ chọn nhóm (Xem tất cả)</span>
-      </div>
-      <div class="group-cards-grid">
-        <!-- NHÓM 1 -->
-        <div class="group-card grp-g1" id="card-grp-g1" data-grp="g1">
-          <div class="group-card-header">
-            <span class="group-badge">🔥 NHÓM 1</span>
-            <div class="group-check">✓</div>
+      <!-- TOP STATS CARDS -->
+      <div class="cards-grid">
+        <div class="card card-primary">
+          <div class="card-header"><span class="card-label">Tổng khách hàng</span>
+            <div class="card-icon card-icon-primary">👥</div>
           </div>
-          <div class="group-card-name">Khách Hàng Nhu Cầu Cao</div>
-          <div class="group-card-sub">Sxtg, Đã đến, Chưa đến lịch, Đặt lịch hẹn...</div>
-          <div class="group-card-stats">
-            <span class="group-card-count" id="count-grp-g1">0</span>
-            <span class="group-card-pct" id="pct-grp-g1">0%</span>
-          </div>
+          <div class="card-value" id="card-total">0</div>
+          <div class="card-sub">Kết quả lọc / Tổng: <span id="card-total-all">0</span></div>
         </div>
-        <!-- NHÓM 2 -->
-        <div class="group-card grp-g2" id="card-grp-g2" data-grp="g2">
-          <div class="group-card-header">
-            <span class="group-badge">💬 NHÓM 2</span>
-            <div class="group-check">✓</div>
+        <div class="card card-success">
+          <div class="card-header"><span class="card-label">Khách Hàng Đã Đến</span>
+            <div class="card-icon card-icon-success">🔥</div>
           </div>
-          <div class="group-card-name">Khách Tham Khảo</div>
-          <div class="group-card-sub">Hỏi thuốc, Tham khảo, Zalo phản hồi...</div>
-          <div class="group-card-stats">
-            <span class="group-card-count" id="count-grp-g2">0</span>
-            <span class="group-card-pct" id="pct-grp-g2">0%</span>
-          </div>
+          <div class="card-value" id="card-g1-pct">0%</div>
+          <div class="card-sub"><span id="card-g1-count">0</span> khách hàng đã đến / Trên Tổng: <span
+              id="card-g1-total-all">0</span></div>
         </div>
-        <!-- NHÓM 3 -->
-        <div class="group-card grp-g3" id="card-grp-g3" data-grp="g3">
-          <div class="group-card-header">
-            <span class="group-badge">❌ NHÓM 3</span>
-            <div class="group-check">✓</div>
+        <div class="card card-warning">
+          <div class="card-header"><span class="card-label">Ngày đang lọc</span>
+            <div class="card-icon card-icon-warning">📅</div>
           </div>
-          <div class="group-card-name">KNC (Không Nhu Cầu)</div>
-          <div class="group-card-sub">KH cũ, K tiềm năng, Không tương tác, Zalo ko phản hồi...</div>
-          <div class="group-card-stats">
-            <span class="group-card-count" id="count-grp-g3">0</span>
-            <span class="group-card-pct" id="pct-grp-g3">0%</span>
-          </div>
+          <div class="card-value" id="card-active-date" style="font-size:22px;">Tất cả</div>
+          <div class="card-sub" id="card-active-date-sub">Toàn bộ chiến dịch</div>
         </div>
-        <!-- NHÓM 4 -->
-        <div class="group-card grp-g4" id="card-grp-g4" data-grp="g4">
-          <div class="group-card-header">
-            <span class="group-badge">⚪ NHÓM 4</span>
-            <div class="group-check">✓</div>
+        <div class="card card-info">
+          <div class="card-header"><span class="card-label">Nhân viên</span>
+            <div class="card-icon card-icon-info">👤</div>
           </div>
-          <div class="group-card-name">Chưa Phân Loại / Khác</div>
-          <div class="group-card-sub">Chưa liên hệ, để trống, thông tin khác...</div>
-          <div class="group-card-stats">
-            <span class="group-card-count" id="count-grp-g4">0</span>
-            <span class="group-card-pct" id="pct-grp-g4">0%</span>
-          </div>
+          <div class="card-value" id="card-sources">0</div>
+          <div class="card-sub">nhân sự phụ trách</div>
         </div>
       </div>
-    </div>
 
-    <!-- MAIN FILTERS -->
-    <div class="filters-card">
-      <div class="filters-header">
-        <div class="filters-title">🔍 Bộ lọc chi tiết</div>
-        <button class="btn btn-secondary btn-sm" id="btn-reset-filters">↺ Reset bộ lọc</button>
+      <!-- 4 STATUS GROUPS INTERACTIVE SELECTOR -->
+      <div class="group-section">
+        <div class="group-section-title">
+          <span>🎯 4 Nhóm Trạng Thái (Bấm vào nhóm để lọc nhanh)</span>
+          <span id="group-clear-btn"
+            style="cursor:pointer;color:var(--primary);text-transform:none;font-weight:600;display:none;">✕ Bỏ chọn nhóm
+            (Xem tất cả)</span>
+        </div>
+        <div class="group-cards-grid">
+          <!-- NHÓM 1 -->
+          <div class="group-card grp-g1" id="card-grp-g1" data-grp="g1">
+            <div class="group-card-header">
+              <span class="group-badge">🔥 NHÓM 1</span>
+              <div class="group-check">✓</div>
+            </div>
+            <div class="group-card-name">Khách Hàng Nhu Cầu Cao</div>
+            <div class="group-card-sub">Sxtg, Đã đến, Chưa đến lịch, Đặt lịch hẹn...</div>
+            <div class="group-card-stats">
+              <span class="group-card-count" id="count-grp-g1">0</span>
+              <span class="group-card-pct" id="pct-grp-g1">0%</span>
+            </div>
+          </div>
+          <!-- NHÓM 2 -->
+          <div class="group-card grp-g2" id="card-grp-g2" data-grp="g2">
+            <div class="group-card-header">
+              <span class="group-badge">💬 NHÓM 2</span>
+              <div class="group-check">✓</div>
+            </div>
+            <div class="group-card-name">Khách Tham Khảo</div>
+            <div class="group-card-sub">Hỏi thuốc, Tham khảo, Zalo phản hồi...</div>
+            <div class="group-card-stats">
+              <span class="group-card-count" id="count-grp-g2">0</span>
+              <span class="group-card-pct" id="pct-grp-g2">0%</span>
+            </div>
+          </div>
+          <!-- NHÓM 3 -->
+          <div class="group-card grp-g3" id="card-grp-g3" data-grp="g3">
+            <div class="group-card-header">
+              <span class="group-badge">❌ NHÓM 3</span>
+              <div class="group-check">✓</div>
+            </div>
+            <div class="group-card-name">KNC (Không Nhu Cầu)</div>
+            <div class="group-card-sub">KH cũ, K tiềm năng, Không tương tác, Zalo ko phản hồi...</div>
+            <div class="group-card-stats">
+              <span class="group-card-count" id="count-grp-g3">0</span>
+              <span class="group-card-pct" id="pct-grp-g3">0%</span>
+            </div>
+          </div>
+          <!-- NHÓM 4 -->
+          <div class="group-card grp-g4" id="card-grp-g4" data-grp="g4">
+            <div class="group-card-header">
+              <span class="group-badge">⚪ NHÓM 4</span>
+              <div class="group-check">✓</div>
+            </div>
+            <div class="group-card-name">Chưa Phân Loại / Khác</div>
+            <div class="group-card-sub">Chưa liên hệ, để trống, thông tin khác...</div>
+            <div class="group-card-stats">
+              <span class="group-card-count" id="count-grp-g4">0</span>
+              <span class="group-card-pct" id="pct-grp-g4">0%</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="filters-row">
-        <!-- Ngày Filter -->
-        <div class="filter-group" style="flex:1.1;min-width:180px;">
-          <label>📅 Lọc theo Ngày (VD: 1/9, 4/9...)</label>
-          <select id="filter-date" class="filter-select"><option value="">Tất cả các ngày</option></select>
-        </div>
-        <!-- Nhân viên Search -->
-        <div class="filter-group" style="flex:1.2;min-width:190px;">
-          <label>🔎 Tìm kiếm nhân viên</label>
-          <input type="text" id="filter-search" class="filter-input" placeholder="Nhập tên (Lợi, Cường, Vy...)" autocomplete="off" />
-        </div>
-        <!-- Nhân viên Select -->
-        <div class="filter-group" style="flex:1.1;min-width:170px;">
-          <label>👤 Nhân viên cụ thể</label>
-          <select id="filter-source" class="filter-select"><option value="">Tất cả nhân viên</option></select>
-        </div>
-        <!-- Dịch vụ Select -->
-        <div class="filter-group" id="filter-service-wrap" style="display:none;flex:1.1;min-width:170px;">
-          <label>🛎️ Dịch vụ</label>
-          <select id="filter-service" class="filter-select"><option value="">Tất cả dịch vụ</option></select>
-        </div>
-        <!-- Trạng thái Grouped Select -->
-        <div class="filter-group" style="flex:1.5;min-width:220px;">
-          <label>📋 Trạng thái (Gom 4 nhóm)</label>
-          <select id="filter-status" class="filter-select"><option value="">Tất cả trạng thái</option></select>
-        </div>
-        <!-- Đặt lịch Select -->
-        <div class="filter-group" id="filter-schedule-wrap" style="display:none;min-width:140px;">
-          <label>⏰ Lịch hẹn</label>
-          <select id="filter-schedule" class="filter-select"><option value="">Tất cả</option></select>
-        </div>
-      </div>
-      <div class="active-filters hidden" id="active-filters"></div>
-    </div>
 
-    <!-- DAILY BREAKDOWN SECTION (PHÂN TÍCH THEO NGÀY) -->
-    <div class="daily-section">
-      <div class="panel">
-        <div class="panel-header">
-          <span class="panel-title">📅 Phân tích số liệu theo từng ngày (Bấm vào ngày để xem chi tiết)</span>
-          <span class="text-xs text-gray" id="daily-summary-info"></span>
+      <!-- MAIN FILTERS BAR -->
+      <div class="filters-card">
+        <div class="filters-bar-main">
+          <div class="filters-bar-left">
+            <button class="btn-filter-trigger" id="btn-open-filter-modal" type="button">
+              <span>🔎</span>
+              <span>Bộ lọc chi tiết</span>
+              <span class="filter-trigger-badge hidden" id="filter-active-count">0</span>
+            </button>
+            <div class="filter-summary-text" id="filter-summary-text"></div>
+          </div>
+          <div class="filters-bar-right">
+            <button class="btn btn-secondary btn-sm hidden" id="btn-quick-reset" type="button">↺ Đặt lại bộ lọc</button>
+          </div>
         </div>
-        <div class="panel-body" style="padding:0;">
-          <div class="daily-table-wrap">
-            <table class="daily-table">
+        <div class="active-filters hidden" id="active-filters"></div>
+      </div>
+
+      <!-- DAILY BREAKDOWN SECTION (PHÂN TÍCH THEO NGÀY) -->
+      <div class="daily-section">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">📅 Phân tích số liệu theo từng ngày (Bấm vào ngày để xem chi tiết)</span>
+            <span class="text-xs text-gray" id="daily-summary-info"></span>
+          </div>
+          <div class="panel-body" style="padding:0;">
+            <div class="daily-table-wrap">
+              <table class="daily-table">
+                <thead>
+                  <tr>
+                    <th>Ngày</th>
+                    <th style="text-align:right;">Tổng lead</th>
+                    <th>🔥 Nhóm 1: Nhu Cầu Cao</th>
+                    <th>💬 Nhóm 2: Tham Khảo</th>
+                    <th>❌ Nhóm 3: KNC</th>
+                    <th>⚪ Nhóm 4: Khác</th>
+                    <th style="text-align:center;">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="daily-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS: CHARTS & STATUS TABLE -->
+      <div class="analytics-grid">
+        <!-- DONUT CHART -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">🍩 Phân bổ theo 4 Nhóm Trạng Thái</span>
+          </div>
+          <div class="panel-body" id="donut-container"></div>
+        </div>
+        <!-- STATUS TABLE -->
+        <div class="panel">
+          <div class="panel-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="panel-title">📋 Bảng thống kê trạng thái</span>
+              <div class="view-toggle">
+                <button class="view-toggle-btn active" id="btn-view-groups">4 Nhóm</button>
+                <button class="view-toggle-btn" id="btn-view-details">Chi tiết</button>
+              </div>
+            </div>
+            <span class="text-xs text-gray" id="status-table-info"></span>
+          </div>
+          <div style="padding:0;">
+            <table class="status-table">
               <thead>
                 <tr>
-                  <th>Ngày</th>
-                  <th style="text-align:right;">Tổng lead</th>
-                  <th>🔥 Nhóm 1: Nhu Cầu Cao</th>
-                  <th>💬 Nhóm 2: Tham Khảo</th>
-                  <th>❌ Nhóm 3: KNC</th>
-                  <th>⚪ Nhóm 4: Khác</th>
-                  <th style="text-align:center;">Thao tác</th>
+                  <th>Trạng thái / Phân loại</th>
+                  <th style="text-align:right;">Số lượng</th>
+                  <th style="min-width:140px;">Tỷ lệ</th>
                 </tr>
               </thead>
-              <tbody id="daily-tbody"></tbody>
+              <tbody id="status-tbody"></tbody>
+              <tfoot id="status-tfoot"></tfoot>
             </table>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ANALYTICS: CHARTS & STATUS TABLE -->
-    <div class="analytics-grid">
-      <!-- DONUT CHART -->
-      <div class="panel">
+      <!-- BAR CHART -->
+      <div class="panel" style="margin-top:20px;">
         <div class="panel-header">
-          <span class="panel-title">🍩 Phân bổ theo 4 Nhóm Trạng Thái</span>
+          <span class="panel-title">📊 Biểu đồ so sánh số lượng trạng thái</span>
         </div>
-        <div class="panel-body" id="donut-container"></div>
+        <div class="panel-body" id="bar-container" style="overflow-x:auto;"></div>
       </div>
-      <!-- STATUS TABLE -->
-      <div class="panel">
+
+      <!-- DATA TABLE -->
+      <div class="data-panel">
         <div class="panel-header">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span class="panel-title">📋 Bảng thống kê trạng thái</span>
-            <div class="view-toggle">
-              <button class="view-toggle-btn active" id="btn-view-groups">4 Nhóm</button>
-              <button class="view-toggle-btn" id="btn-view-details">Chi tiết</button>
+          <span class="panel-title">📑 Danh sách dữ liệu chi tiết</span>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <label style="font-size:12px;color:var(--gray-500);">Dòng:</label>
+            <select id="page-size" class="filter-select" style="padding:4px 24px 4px 8px;font-size:12px;">
+              <option value="20">20 dòng</option>
+              <option value="50">50 dòng</option>
+              <option value="100">100 dòng</option>
+            </select>
+            <span class="text-xs text-gray" id="data-count"></span>
+          </div>
+        </div>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead id="dt-head"></thead>
+            <tbody id="dt-body"></tbody>
+          </table>
+          <div class="empty-state hidden" id="dt-empty">
+            <span class="empty-state-icon">🔍</span>
+            <h3>Không tìm thấy dữ liệu phù hợp</h3>
+            <p>Thử bỏ bớt bộ lọc hoặc chọn ngày khác</p>
+          </div>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FILTER MODAL POPUP -->
+  <div class="modal-backdrop hidden" id="filter-modal-backdrop" role="dialog" aria-modal="true"
+    aria-labelledby="modal-filter-title">
+    <div class="modal-dialog" id="filter-modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-title" id="modal-filter-title">🔎 Bộ lọc chi tiết</div>
+          <div class="modal-subtitle">Hỗ trợ chọn nhiều giá trị – Bấm 'Áp dụng bộ lọc' để cập nhật dữ liệu</div>
+        </div>
+        <button class="modal-close-btn" id="btn-close-filter-modal" type="button" title="Đóng">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-filters-grid">
+          <!-- Ngày Filter -->
+          <div class="ms-form-group" id="group-filter-date">
+            <label class="ms-label">📅 Lọc theo Ngày</label>
+            <div class="ms-widget" id="ms-widget-date">
+              <button type="button" class="ms-trigger" id="ms-trigger-date">
+                <span class="ms-trigger-text is-all" id="ms-text-date">Tất cả các ngày</span>
+                <span class="ms-trigger-arrow">▼</span>
+              </button>
+              <div class="ms-dropdown" id="ms-dropdown-date">
+                <div class="ms-search-box">
+                  <input type="text" class="ms-search-input" id="ms-search-date" placeholder="🔍 Tìm ngày..."
+                    autocomplete="off" />
+                </div>
+                <div class="ms-options-list" id="ms-list-date"></div>
+              </div>
             </div>
           </div>
-          <span class="text-xs text-gray" id="status-table-info"></span>
+
+          <!-- Nhân viên Filter -->
+          <div class="ms-form-group" id="group-filter-source">
+            <label class="ms-label">👤 Nhân viên cụ thể</label>
+            <div class="ms-widget" id="ms-widget-source">
+              <button type="button" class="ms-trigger" id="ms-trigger-source">
+                <span class="ms-trigger-text is-all" id="ms-text-source">Tất cả nhân viên</span>
+                <span class="ms-trigger-arrow">▼</span>
+              </button>
+              <div class="ms-dropdown" id="ms-dropdown-source">
+                <div class="ms-search-box">
+                  <input type="text" class="ms-search-input" id="ms-search-source" placeholder="🔍 Tìm nhân viên..."
+                    autocomplete="off" />
+                </div>
+                <div class="ms-options-list" id="ms-list-source"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dịch vụ Filter -->
+          <div class="ms-form-group" id="group-filter-service" style="display:none;">
+            <label class="ms-label">🛎️ Dịch vụ</label>
+            <div class="ms-widget" id="ms-widget-service">
+              <button type="button" class="ms-trigger" id="ms-trigger-service">
+                <span class="ms-trigger-text is-all" id="ms-text-service">Tất cả dịch vụ</span>
+                <span class="ms-trigger-arrow">▼</span>
+              </button>
+              <div class="ms-dropdown" id="ms-dropdown-service">
+                <div class="ms-search-box">
+                  <input type="text" class="ms-search-input" id="ms-search-service" placeholder="🔍 Tìm dịch vụ..."
+                    autocomplete="off" />
+                </div>
+                <div class="ms-options-list" id="ms-list-service"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lịch hẹn Filter -->
+          <div class="ms-form-group" id="group-filter-schedule" style="display:none;">
+            <label class="ms-label">⏰ Lịch hẹn</label>
+            <div class="ms-widget" id="ms-widget-schedule">
+              <button type="button" class="ms-trigger" id="ms-trigger-schedule">
+                <span class="ms-trigger-text is-all" id="ms-text-schedule">Tất cả</span>
+                <span class="ms-trigger-arrow">▼</span>
+              </button>
+              <div class="ms-dropdown" id="ms-dropdown-schedule">
+                <div class="ms-search-box">
+                  <input type="text" class="ms-search-input" id="ms-search-schedule" placeholder="🔍 Tìm lịch hẹn..."
+                    autocomplete="off" />
+                </div>
+                <div class="ms-options-list" id="ms-list-schedule"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trạng thái Grouped Select (Chiếm full 2 cột) -->
+          <div class="ms-form-group ms-form-group-full" id="group-filter-status">
+            <label class="ms-label">📋 Trạng thái (Gom 4 nhóm)</label>
+            <div class="ms-widget" id="ms-widget-status">
+              <button type="button" class="ms-trigger" id="ms-trigger-status">
+                <span class="ms-trigger-text is-all" id="ms-text-status">Tất cả trạng thái (Tất cả nhóm)</span>
+                <span class="ms-trigger-arrow">▼</span>
+              </button>
+              <div class="ms-dropdown" id="ms-dropdown-status">
+                <div class="ms-search-box">
+                  <input type="text" class="ms-search-input" id="ms-search-status" placeholder="🔍 Tìm trạng thái..."
+                    autocomplete="off" />
+                </div>
+                <div class="ms-options-list" id="ms-list-status"></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div style="padding:0;">
-          <table class="status-table">
-            <thead>
-              <tr>
-                <th>Trạng thái / Phân loại</th>
-                <th style="text-align:right;">Số lượng</th>
-                <th style="min-width:140px;">Tỷ lệ</th>
-              </tr>
-            </thead>
-            <tbody id="status-tbody"></tbody>
-            <tfoot id="status-tfoot"></tfoot>
-          </table>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-modal-reset" type="button">↺ Đặt lại bộ lọc</button>
+        <div class="modal-footer-right">
+          <button class="btn btn-secondary" id="btn-modal-cancel" type="button">Hủy</button>
+          <button class="btn btn-primary" id="btn-modal-apply" type="button">Áp dụng bộ lọc</button>
         </div>
       </div>
     </div>
-
-    <!-- BAR CHART -->
-    <div class="panel" style="margin-top:20px;">
-      <div class="panel-header">
-        <span class="panel-title">📊 Biểu đồ so sánh số lượng trạng thái</span>
-      </div>
-      <div class="panel-body" id="bar-container" style="overflow-x:auto;"></div>
-    </div>
-
-    <!-- DATA TABLE -->
-    <div class="data-panel">
-      <div class="panel-header">
-        <span class="panel-title">📑 Danh sách dữ liệu chi tiết</span>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <label style="font-size:12px;color:var(--gray-500);">Dòng:</label>
-          <select id="page-size" class="filter-select" style="padding:4px 24px 4px 8px;font-size:12px;">
-            <option value="20">20 dòng</option>
-            <option value="50">50 dòng</option>
-            <option value="100">100 dòng</option>
-          </select>
-          <span class="text-xs text-gray" id="data-count"></span>
-        </div>
-      </div>
-      <div class="data-table-wrap">
-        <table class="data-table">
-          <thead id="dt-head"></thead>
-          <tbody id="dt-body"></tbody>
-        </table>
-        <div class="empty-state hidden" id="dt-empty">
-          <span class="empty-state-icon">🔍</span>
-          <h3>Không tìm thấy dữ liệu phù hợp</h3>
-          <p>Thử bỏ bớt bộ lọc hoặc chọn ngày khác</p>
-        </div>
-      </div>
-      <div class="pagination" id="pagination"></div>
-    </div>
-
   </div>
-</div>
 
-<script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
-<script>
-(function(){
-'use strict';
+  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+  <script>
+    (function () {
+      'use strict';
 
-// 4 STATUS GROUPS DEFINITION
-const GROUPS = {
-  g1: {
-    id: 'g1',
-    name: 'Khách Hàng Nhu Cầu Cao',
-    short: 'Nhu Cầu Cao',
-    icon: '🔥',
-    color: '#059669',
-    bg: '#ecfdf5',
-    border: '#a7f3d0',
-    badge: '#10b981'
-  },
-  g2: {
-    id: 'g2',
-    name: 'Tham Khảo',
-    short: 'Tham Khảo',
-    icon: '💬',
-    color: '#2563eb',
-    bg: '#eff6ff',
-    border: '#bfdbfe',
-    badge: '#3b82f6'
-  },
-  g3: {
-    id: 'g3',
-    name: 'KNC (Không Nhu Cầu)',
-    short: 'KNC',
-    icon: '❌',
-    color: '#dc2626',
-    bg: '#fef2f2',
-    border: '#fecaca',
-    badge: '#ef4444'
-  },
-  g4: {
-    id: 'g4',
-    name: 'Chưa Liên Hệ / Khác',
-    short: 'Chưa Phân Loại',
-    icon: '⚪',
-    color: '#4b5563',
-    bg: '#f9fafb',
-    border: '#e5e7eb',
-    badge: '#6b7280'
-  }
-};
+      // 4 STATUS GROUPS DEFINITION
+      const GROUPS = {
+        g1: {
+          id: 'g1',
+          name: 'Khách Hàng Nhu Cầu Cao',
+          short: 'Nhu Cầu Cao',
+          icon: '🔥',
+          color: '#059669',
+          bg: '#ecfdf5',
+          border: '#a7f3d0',
+          badge: '#10b981'
+        },
+        g2: {
+          id: 'g2',
+          name: 'Tham Khảo',
+          short: 'Tham Khảo',
+          icon: '💬',
+          color: '#2563eb',
+          bg: '#eff6ff',
+          border: '#bfdbfe',
+          badge: '#3b82f6'
+        },
+        g3: {
+          id: 'g3',
+          name: 'KNC (Không Nhu Cầu)',
+          short: 'KNC',
+          icon: '❌',
+          color: '#dc2626',
+          bg: '#fef2f2',
+          border: '#fecaca',
+          badge: '#ef4444'
+        },
+        g4: {
+          id: 'g4',
+          name: 'Chưa Liên Hệ / Khác',
+          short: 'Chưa Phân Loại',
+          icon: '⚪',
+          color: '#4b5563',
+          bg: '#f9fafb',
+          border: '#e5e7eb',
+          badge: '#6b7280'
+        }
+      };
 
-// STATUS GROUP CLASSIFICATION
-function classifyStatus(rawStatus, datLich){
-  const s = norm(rawStatus).toLowerCase();
-  const dl = norm(datLich).toLowerCase();
+      // STATUS GROUP CLASSIFICATION
+      function classifyStatus(rawStatus, datLich) {
+        const s = norm(rawStatus).toLowerCase();
+        const dl = norm(datLich).toLowerCase();
 
-  // If status empty but has booking/appointment -> G1
-  if(!s || s === 'chưa xác định' || s === 'chưa cập nhật' || s === 'chưa liên hệ' || s === 'trống'){
-    if(dl && dl !== 'none' && dl !== 'nan' && dl !== 'không' && dl !== 'k'){
-      return 'g1';
-    }
-    return 'g4';
-  }
+        // If status empty but has booking/appointment -> G1
+        if (!s || s === 'chưa xác định' || s === 'chưa cập nhật' || s === 'chưa liên hệ' || s === 'trống') {
+          if (dl && dl !== 'none' && dl !== 'nan' && dl !== 'không' && dl !== 'k') {
+            return 'g1';
+          }
+          return 'g4';
+        }
 
-  // 1. NHÓM 1: Nhu Cầu Cao (Sxtg, Đã đến, Chưa đến lịch, Đặt lịch, lịch hẹn có giờ)
-  if(
-    s.includes('đã đến') || s.includes('da den') ||
-    s.includes('sxtg') || s.includes('đến lịch') || s.includes('den lich') ||
-    s.includes('đặt lịch') || s.includes('dat lich') ||
-    /\b\d{1,2}h\d*\b/.test(s)
-  ){
-    return 'g1';
-  }
+        // 1. NHÓM 1: Nhu Cầu Cao (Sxtg, Đã đến, Chưa đến lịch, Đặt lịch, lịch hẹn có giờ)
+        if (
+          s.includes('đã đến') || s.includes('da den') ||
+          s.includes('sxtg') || s.includes('đến lịch') || s.includes('den lich') ||
+          s.includes('đặt lịch') || s.includes('dat lich') ||
+          /\b\d{1,2}h\d*\b/.test(s)
+        ) {
+          return 'g1';
+        }
 
-  // 3. NHÓM 3: KNC (K tiềm năng, Zalo ko phản hồi, KH cũ, Không tương tác, PK ko hỗ trợ, Tỉnh, Hủy lịch...)
-  if(
-    s.includes('k tiềm năng') || s.includes('k tiem nang') ||
-    s.includes('không tiềm năng') || s.includes('khong tiem nang') ||
-    s.includes('không tương tác') || s.includes('khong tuong tac') ||
-    s.includes('ko phản') || s.includes('kh phản') || s.includes('k phản') ||
-    s.includes('ko phan') || s.includes('kh phan') || s.includes('k phan') ||
-    s.includes('khách cũ') || s.includes('khach cu') || s.includes('kh cũ') || s.includes('kh cu') ||
-    s.includes('kcnc') || s.includes('k htro') || s.includes('không hỗ trợ') || s.includes('khong ho tro') ||
-    s.includes('rải số') || s.includes('rai so') || s.includes('hủy lịch') || s.includes('huy lich') ||
-    s.includes('chưa đủ tuổi') || s.includes('chua du tuoi') || s.includes('tỉnh') || s.includes('tinh')
-  ){
-    return 'g3';
-  }
+        // 3. NHÓM 3: KNC (K tiềm năng, Zalo ko phản hồi, KH cũ, Không tương tác, PK ko hỗ trợ, Tỉnh, Hủy lịch...)
+        if (
+          s.includes('k tiềm năng') || s.includes('k tiem nang') ||
+          s.includes('không tiềm năng') || s.includes('khong tiem nang') ||
+          s.includes('không tương tác') || s.includes('khong tuong tac') ||
+          s.includes('ko phản') || s.includes('kh phản') || s.includes('k phản') ||
+          s.includes('ko phan') || s.includes('kh phan') || s.includes('k phan') ||
+          s.includes('khách cũ') || s.includes('khach cu') || s.includes('kh cũ') || s.includes('kh cu') ||
+          s.includes('kcnc') || s.includes('k htro') || s.includes('không hỗ trợ') || s.includes('khong ho tro') ||
+          s.includes('rải số') || s.includes('rai so') || s.includes('hủy lịch') || s.includes('huy lich') ||
+          s.includes('chưa đủ tuổi') || s.includes('chua du tuoi') || s.includes('tỉnh') || s.includes('tinh')
+        ) {
+          return 'g3';
+        }
 
-  // 2. NHÓM 2: Tham Khảo (Hỏi thuốc, Tham khảo, Zalo phản hồi)
-  if(
-    s.includes('tham khảo') || s.includes('tham khao') ||
-    s.includes('thuốc') || s.includes('thuoc') || s === 'ốc' ||
-    s.includes('zalo ph') || s.includes('phản hồi') || s.includes('phan hoi') ||
-    s.includes('tvzl') || s.includes('htrzalo') ||
-    s === 'ph' || /\bph\b/.test(s)
-  ){
-    return 'g2';
-  }
+        // 2. NHÓM 2: Tham Khảo (Hỏi thuốc, Tham khảo, Zalo phản hồi)
+        if (
+          s.includes('tham khảo') || s.includes('tham khao') ||
+          s.includes('thuốc') || s.includes('thuoc') || s === 'ốc' ||
+          s.includes('zalo ph') || s.includes('phản hồi') || s.includes('phan hoi') ||
+          s.includes('tvzl') || s.includes('htrzalo') ||
+          s === 'ph' || /\bph\b/.test(s)
+        ) {
+          return 'g2';
+        }
 
-  return 'g4';
-}
-
-// PALETTE FOR DETAILED STATUSES
-const PAL = ['#6366f1','#10b981','#f59e0b','#3b82f6','#ef4444','#8b5cf6','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6','#eab308','#64748b','#a855f7','#0ea5e9'];
-const colorMap = {};
-let ci = 0;
-function gc(s){
-  if(!colorMap[s]){ colorMap[s] = PAL[ci % PAL.length]; ci++; }
-  return colorMap[s];
-}
-function resetColors(){ Object.keys(colorMap).forEach(k => delete colorMap[k]); ci = 0; }
-
-// ALIASES FOR DETECTING COLUMNS
-const ALIASES = {
-  date: ['ngày', 'ngay', 'date', 'thời gian', 'thoi gian', 'ngày tiếp nhận'],
-  source: ['nguồn', 'nguon', 'source', 'nguồn lead', 'nguon lead', 'kênh', 'kenh', 'nhân viên', 'nhan vien', 'fb', 'zalo'],
-  service: ['dịch vụ', 'dich vu', 'service', 'loại dịch vụ', 'loai dich vu', 'sản phẩm', 'san pham', 'service type'],
-  status: ['trạng thái', 'trang thai', 'status', 'tình trạng', 'tinh trang'],
-  schedule: ['đặt lịch', 'dat lich', 'lịch hẹn', 'lich hen', 'schedule'],
-  name: ['họ tên kh', 'ho ten kh', 'họ và tên', 'ho va ten', 'tên kh', 'ten kh', 'full name', 'họ tên', 'ho ten']
-};
-
-// APP STATE
-const S = {
-  all: [],
-  cols: [],
-  colDate: null,
-  colSrc: null,
-  colSvc: null,
-  colSts: null,
-  colSch: null,
-  colName: null,
-  
-  // Filters
-  fDate: '',
-  fSearch: '',
-  fSrc: '',
-  fSvc: '',
-  fSts: '',
-  fGroup: '',
-  fSch: '',
-  
-  // View Settings
-  statusViewMode: 'groups', // 'groups' or 'details'
-  sortCol: null,
-  sortDir: 'asc',
-  page: 1,
-  pageSize: 20,
-  fileName: ''
-};
-
-// DOM HELPERS
-const $ = id => document.getElementById(id);
-const uploadScr = $('upload-screen'), mapperScr = $('mapper-screen'), dashScr = $('dashboard-screen'), loadScr = $('loading-screen');
-const dropZone = $('drop-zone'), fileInput = $('file-input');
-
-function norm(v){ return v == null ? '' : String(v).trim().replace(/\s+/g, ' '); }
-function nk(v){ return norm(v).toLowerCase(); }
-function fmt(n){ return Number(n || 0).toLocaleString('vi-VN'); }
-function pct(n, d = 1){ return (Number(n) || 0).toFixed(d) + '%'; }
-function esc(s){ return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-function hl(t, q){
-  if(!q) return esc(t);
-  const e = esc(t);
-  const eq = esc(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return e.replace(new RegExp(eq, 'gi'), m => `<mark class="hl">${m}</mark>`);
-}
-function hex2rgba(h, a){
-  if(!h || !h.startsWith('#') || h.length < 7) return `rgba(100,100,100,${a})`;
-  const r = parseInt(h.slice(1,3), 16), g = parseInt(h.slice(3,5), 16), b = parseInt(h.slice(5,7), 16);
-  return `rgba(${r},${g},${b},${a})`;
-}
-
-// SCREEN TRANSITIONS
-function show(screen){
-  [uploadScr, mapperScr, dashScr].forEach(s => s.classList.add('hidden'));
-  if(screen === 'upload') uploadScr.classList.remove('hidden');
-  else if(screen === 'mapper') mapperScr.classList.remove('hidden');
-  else if(screen === 'dash') dashScr.classList.remove('hidden');
-}
-function showLoad(msg = 'Đang phân tích...'){ $('loading-msg').textContent = msg; loadScr.classList.remove('hidden'); }
-function hideLoad(){ loadScr.classList.add('hidden'); }
-function showErr(msg){
-  const e = $('error-upload');
-  e.innerHTML = `<div class="error-bar">⚠️ ${esc(msg)}</div>`;
-  e.classList.remove('hidden');
-}
-
-// UPLOAD HANDLERS
-dropZone.addEventListener('click', () => fileInput.click());
-dropZone.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' ') fileInput.click(); });
-$('btn-new-upload').addEventListener('click', () => {
-  fileInput.value = '';
-  $('error-upload').classList.add('hidden');
-  show('upload');
-  $('file-badge').classList.add('hidden');
-  $('btn-export').classList.add('hidden');
-});
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  const f = e.dataTransfer.files[0];
-  if(f) handleFile(f);
-});
-fileInput.addEventListener('change', e => { const f = e.target.files[0]; if(f) handleFile(f); });
-
-function handleFile(file){
-  if(!file.name.toLowerCase().endsWith('.csv')){ showErr('Chỉ chấp nhận file .csv!'); return; }
-  S.fileName = file.name;
-  showLoad('Đang đọc file CSV...');
-  Papa.parse(file, {
-    header: false,
-    skipEmptyLines: true,
-    encoding: 'UTF-8',
-    complete: r => onParsed(r),
-    error: err => { hideLoad(); showErr('Không thể đọc file: ' + err.message); }
-  });
-}
-
-// INTELLIGENT CSV PARSING & FORWARD-FILL DATE
-function onParsed(result){
-  hideLoad();
-  const rows = result.data;
-  if(!rows || rows.length < 2){ showErr('File CSV trống hoặc không có dữ liệu.'); return; }
-
-  // 1. Locate Header Row
-  let hi = 0;
-  for(let i = 0; i < Math.min(6, rows.length); i++){
-    if(rows[i].filter(c => norm(c).length > 0).length >= 3){ hi = i; break; }
-  }
-  const rawHeaders = rows[hi];
-  const sampleRows = rows.slice(hi + 1, hi + 30);
-
-  // 2. Intelligent Header Cleaning & Name Assignment
-  const cleanedHeaders = [];
-  const nameCounts = {};
-  for(let colIdx = 0; colIdx < rawHeaders.length; colIdx++){
-    let colName = norm(rawHeaders[colIdx]);
-    const colSamples = sampleRows.map(r => norm(r[colIdx])).filter(Boolean);
-
-    if(!colName){
-      // If first column or has date format like 1/9, 01/09
-      if(colIdx === 0 || colSamples.some(s => /^\d{1,2}[/-]\d{1,2}/.test(s))){
-        colName = 'Ngày';
-      } else if(colSamples.some(s => /(fb|zalo|hotline|telesale|trâm|lợi|cường|vy)/i.test(s))){
-        colName = 'Nguồn (Nhân viên)';
-      } else {
-        colName = 'Cột ' + (colIdx + 1);
+        return 'g4';
       }
-    }
 
-    const cnt = (nameCounts[colName] || 0) + 1;
-    nameCounts[colName] = cnt;
-    cleanedHeaders.push(cnt === 1 ? colName : `${colName} (${cnt})`);
-  }
-
-  // 3. Detect Columns
-  function detect(aliases){
-    const hn = cleanedHeaders.map(h => nk(h));
-    for(const a of aliases){
-      const i = hn.findIndex(h => h.includes(a));
-      if(i >= 0) return cleanedHeaders[i];
-    }
-    return null;
-  }
-
-  S.colDate = detect(ALIASES.date) || cleanedHeaders[0];
-  S.colSrc = detect(ALIASES.source);
-  S.colSvc = detect(ALIASES.service);
-  S.colSts = detect(ALIASES.status);
-  S.colSch = detect(ALIASES.schedule);
-  S.colName = detect(ALIASES.name);
-
-  // 4. Extract Data Rows with FORWARD-FILL for Date (Merged Cells handling)
-  let curDate = 'Chưa xác định';
-  const dataRows = [];
-  for(let rIdx = hi + 1; rIdx < rows.length; rIdx++){
-    const rawR = rows[rIdx];
-    if(!rawR || !rawR.some(c => norm(c).length > 0)) continue;
-
-    // Helper to clean dates like '7/9alo/ Trâm...' -> '7/9'
-    function cleanDate(val){
-      if(!val) return '';
-      const s = norm(val);
-      const m = s.match(/^(\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?)/);
-      return m ? m[1].replace('-', '/') : s;
-    }
-
-    // Check date forward fill
-    const dateIdx = cleanedHeaders.indexOf(S.colDate);
-    if(dateIdx >= 0 && norm(rawR[dateIdx])){
-      curDate = cleanDate(rawR[dateIdx]);
-    }
-
-    const rowObj = {};
-    cleanedHeaders.forEach((h, i) => {
-      let val = norm(rawR[i] ?? '');
-      if(h === S.colDate){
-        val = cleanDate(val) || curDate;
+      // PALETTE FOR DETAILED STATUSES
+      const PAL = ['#6366f1', '#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#84cc16', '#ec4899', '#14b8a6', '#eab308', '#64748b', '#a855f7', '#0ea5e9'];
+      const colorMap = {};
+      let ci = 0;
+      function gc(s) {
+        if (!colorMap[s]) { colorMap[s] = PAL[ci % PAL.length]; ci++; }
+        return colorMap[s];
       }
-      rowObj[h] = val;
-    });
+      function resetColors() { Object.keys(colorMap).forEach(k => delete colorMap[k]); ci = 0; }
 
-    // Skip blank dummy rows with no name or status or source
-    dataRows.push(rowObj);
-  }
+      // ALIASES FOR DETECTING COLUMNS
+      const ALIASES = {
+        date: ['ngày', 'ngay', 'date', 'thời gian', 'thoi gian', 'ngày tiếp nhận'],
+        source: ['nguồn', 'nguon', 'source', 'nguồn lead', 'nguon lead', 'kênh', 'kenh', 'nhân viên', 'nhan vien', 'fb', 'zalo'],
+        service: ['dịch vụ', 'dich vu', 'service', 'loại dịch vụ', 'loai dich vu', 'sản phẩm', 'san pham', 'service type'],
+        status: ['trạng thái', 'trang thai', 'status', 'tình trạng', 'tinh trang'],
+        schedule: ['đặt lịch', 'dat lich', 'lịch hẹn', 'lich hen', 'schedule'],
+        name: ['họ tên kh', 'ho ten kh', 'họ và tên', 'ho va ten', 'tên kh', 'ten kh', 'full name', 'họ tên', 'ho ten']
+      };
 
-  S.cols = cleanedHeaders;
-  S.all = dataRows;
-  resetColors();
+      // APP STATE
+      const S = {
+        all: [],
+        cols: [],
+        colDate: null,
+        colSrc: null,
+        colSvc: null,
+        colSts: null,
+        colSch: null,
+        colName: null,
 
-  if(!S.colSrc || !S.colSts){
-    openMapper(cleanedHeaders);
-  } else {
-    processData();
-  }
-}
+        // Filters (Multi-select)
+        fDates: [],
+        fSearch: '',
+        fSrcs: [],
+        fSvcs: [],
+        fStss: [],
+        fGroup: '',
+        fSchs: [],
 
-// MAPPER SCREEN HANDLER
-function openMapper(headers){
-  const selects = [
-    { id: 'map-source', cur: S.colSrc },
-    { id: 'map-service', cur: S.colSvc },
-    { id: 'map-status', cur: S.colSts },
-    { id: 'map-date', cur: S.colDate },
-    { id: 'map-schedule', cur: S.colSch },
-    { id: 'map-name', cur: S.colName }
-  ];
+        // View Settings
+        statusViewMode: 'groups', // 'groups' or 'details'
+        sortCol: null,
+        sortDir: 'asc',
+        page: 1,
+        pageSize: 20,
+        fileName: ''
+      };
 
-  selects.forEach(({ id, cur }) => {
-    const sel = $(id);
-    while(sel.children.length > 1) sel.removeChild(sel.lastChild);
-    headers.forEach(h => {
-      const opt = document.createElement('option');
-      opt.value = h; opt.textContent = h;
-      sel.appendChild(opt);
-    });
-    if(cur) sel.value = cur;
-  });
-  show('mapper');
-}
+      // DOM HELPERS
+      const $ = id => document.getElementById(id);
+      const uploadScr = $('upload-screen'), mapperScr = $('mapper-screen'), dashScr = $('dashboard-screen'), loadScr = $('loading-screen');
+      const dropZone = $('drop-zone'), fileInput = $('file-input');
 
-$('btn-mapper-confirm').addEventListener('click', () => {
-  const src = $('map-source').value, sts = $('map-status').value;
-  if(!src){ alert('Vui lòng chọn cột Nhân viên.'); return; }
-  if(!sts){ alert('Vui lòng chọn cột Trạng thái.'); return; }
-  S.colSrc = src;
-  S.colSvc = $('map-service').value || null;
-  S.colSts = sts;
-  S.colDate = $('map-date').value || S.colDate;
-  S.colSch = $('map-schedule').value || null;
-  S.colName = $('map-name').value || null;
-  processData();
-});
-$('btn-mapper-back').addEventListener('click', () => show('upload'));
+      function norm(v) { return v == null ? '' : String(v).trim().replace(/\s+/g, ' '); }
+      function nk(v) { return norm(v).toLowerCase(); }
+      function fmt(n) { return Number(n || 0).toLocaleString('vi-VN'); }
+      function pct(n, d = 1) { return (Number(n) || 0).toFixed(d) + '%'; }
+      function esc(s) { return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+      function hl(t, q) {
+        if (!q) return esc(t);
+        const e = esc(t);
+        const eq = esc(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return e.replace(new RegExp(eq, 'gi'), m => `<mark class="hl">${m}</mark>`);
+      }
+      function hex2rgba(h, a) {
+        if (!h || !h.startsWith('#') || h.length < 7) return `rgba(100,100,100,${a})`;
+        const r = parseInt(h.slice(1, 3), 16), g = parseInt(h.slice(3, 5), 16), b = parseInt(h.slice(5, 7), 16);
+        return `rgba(${r},${g},${b},${a})`;
+      }
 
-// PROCESS DATA & INITIALIZE FILTERS
-function processData(){
-  showLoad('Đang phân tích 4 nhóm trạng thái...');
-  setTimeout(() => {
-    // Standardize all rows with _group assignment
-    S.all = S.all.map(row => {
-      const r = { ...row };
-      const rawSrc = r[S.colSrc] ?? '';
-      const rawSts = r[S.colSts] ?? '';
-      const rawSch = S.colSch ? (r[S.colSch] ?? '') : '';
-      const rawDate = S.colDate ? (r[S.colDate] ?? '') : '';
+      // SCREEN TRANSITIONS
+      function show(screen) {
+        [uploadScr, mapperScr, dashScr].forEach(s => s.classList.add('hidden'));
+        if (screen === 'upload') uploadScr.classList.remove('hidden');
+        else if (screen === 'mapper') mapperScr.classList.remove('hidden');
+        else if (screen === 'dash') dashScr.classList.remove('hidden');
+      }
+      function showLoad(msg = 'Đang phân tích...') { $('loading-msg').textContent = msg; loadScr.classList.remove('hidden'); }
+      function hideLoad() { loadScr.classList.add('hidden'); }
+      function showErr(msg) {
+        const e = $('error-upload');
+        e.innerHTML = `<div class="error-bar">⚠️ ${esc(msg)}</div>`;
+        e.classList.remove('hidden');
+      }
 
-      r[S.colSrc] = rawSrc.trim() === '' ? 'Không có nguồn' : rawSrc.trim();
-      r[S.colSts] = rawSts.trim() === '' ? 'Chưa xác định' : rawSts.trim();
-      r[S.colDate] = rawDate.trim() === '' ? 'Chưa xác định' : rawDate.trim();
+      // UPLOAD HANDLERS
+      dropZone.addEventListener('click', () => fileInput.click());
+      dropZone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
+      $('btn-new-upload').addEventListener('click', () => {
+        fileInput.value = '';
+        $('error-upload').classList.add('hidden');
+        show('upload');
+        $('file-badge').classList.add('hidden');
+        $('btn-export').classList.add('hidden');
+      });
+      dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const f = e.dataTransfer.files[0];
+        if (f) handleFile(f);
+      });
+      fileInput.addEventListener('change', e => { const f = e.target.files[0]; if (f) handleFile(f); });
 
-      // Assign status group ID (g1, g2, g3, g4)
-      r._grp = classifyStatus(r[S.colSts], rawSch);
-      return r;
-    });
+      function handleFile(file) {
+        if (!file.name.toLowerCase().endsWith('.csv')) { showErr('Chỉ chấp nhận file .csv!'); return; }
+        S.fileName = file.name;
+        showLoad('Đang đọc file CSV...');
+        Papa.parse(file, {
+          header: false,
+          skipEmptyLines: true,
+          encoding: 'UTF-8',
+          complete: r => onParsed(r),
+          error: err => { hideLoad(); showErr('Không thể đọc file: ' + err.message); }
+        });
+      }
 
-    populateFilters();
+      // INTELLIGENT CSV PARSING & FORWARD-FILL DATE
+      function onParsed(result) {
+        hideLoad();
+        const rows = result.data;
+        if (!rows || rows.length < 2) { showErr('File CSV trống hoặc không có dữ liệu.'); return; }
 
-    // Reset filters
-    S.fDate = ''; S.fSearch = ''; S.fSrc = ''; S.fSts = ''; S.fGroup = ''; S.fSch = '';
-    S.sortCol = null; S.sortDir = 'asc'; S.page = 1; S.pageSize = 20;
-    $('page-size').value = '20';
+        // 1. Locate Header Row
+        let hi = 0;
+        for (let i = 0; i < Math.min(6, rows.length); i++) {
+          if (rows[i].filter(c => norm(c).length > 0).length >= 3) { hi = i; break; }
+        }
+        const rawHeaders = rows[hi];
+        const sampleRows = rows.slice(hi + 1, hi + 30);
 
-    $('file-name-display').textContent = S.fileName;
-    $('file-badge').classList.remove('hidden');
-    $('btn-export').classList.remove('hidden');
-    $('card-total-all').textContent = fmt(S.all.length);
-    $('card-g1-total-all').textContent = fmt(S.all.length);
-    $('filter-schedule-wrap').style.display = S.colSch ? '' : 'none';
+        // 2. Intelligent Header Cleaning & Name Assignment
+        const cleanedHeaders = [];
+        const nameCounts = {};
+        for (let colIdx = 0; colIdx < rawHeaders.length; colIdx++) {
+          let colName = norm(rawHeaders[colIdx]);
+          const colSamples = sampleRows.map(r => norm(r[colIdx])).filter(Boolean);
 
-    show('dash');
-    hideLoad();
-    update();
-  }, 60);
-}
+          if (!colName) {
+            // If first column or has date format like 1/9, 01/09
+            if (colIdx === 0 || colSamples.some(s => /^\d{1,2}[/-]\d{1,2}/.test(s))) {
+              colName = 'Ngày';
+            } else if (colSamples.some(s => /(fb|zalo|hotline|telesale|trâm|lợi|cường|vy)/i.test(s))) {
+              colName = 'Nguồn (Nhân viên)';
+            } else {
+              colName = 'Cột ' + (colIdx + 1);
+            }
+          }
 
-// POPULATE ALL FILTER DROPDOWNS
-function populateFilters(){
-  function sortDates(a, b){
-    const ma = a.match(/^(\d{1,2})[/-](\d{1,2})/);
-    const mb = b.match(/^(\d{1,2})[/-](\d{1,2})/);
-    if(ma && mb){
-      const d1 = parseInt(ma[1]), m1 = parseInt(ma[2]);
-      const d2 = parseInt(mb[1]), m2 = parseInt(mb[2]);
-      if(m1 !== m2) return m1 - m2;
-      return d1 - d2;
-    }
-    return a.localeCompare(b, 'vi');
-  }
+          const cnt = (nameCounts[colName] || 0) + 1;
+          nameCounts[colName] = cnt;
+          cleanedHeaders.push(cnt === 1 ? colName : `${colName} (${cnt})`);
+        }
 
-  // 1. Date Filter
-  if(S.colDate){
-    const dateCounts = {};
-    S.all.forEach(r => { const d = r[S.colDate]; dateCounts[d] = (dateCounts[d] || 0) + 1; });
-    const dates = Object.keys(dateCounts).sort(sortDates);
-    const fd = $('filter-date');
-    fd.innerHTML = '<option value="">Tất cả các ngày</option>';
-    dates.forEach(d => {
-      const opt = document.createElement('option');
-      opt.value = d;
-      opt.textContent = `Ngày ${d} (${fmt(dateCounts[d])} lead)`;
-      fd.appendChild(opt);
-    });
-  }
+        // 3. Detect Columns
+        function detect(aliases) {
+          const hn = cleanedHeaders.map(h => nk(h));
+          for (const a of aliases) {
+            const i = hn.findIndex(h => h.includes(a));
+            if (i >= 0) return cleanedHeaders[i];
+          }
+          return null;
+        }
 
-  // 2. Sources Filter
-  const srcs = [...new Set(S.all.map(r => r[S.colSrc]))].sort();
-  const fs = $('filter-source');
-  fs.innerHTML = '<option value="">Tất cả nhân viên</option>';
-  srcs.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; fs.appendChild(o); });
+        S.colDate = detect(ALIASES.date) || cleanedHeaders[0];
+        S.colSrc = detect(ALIASES.source);
+        S.colSvc = detect(ALIASES.service);
+        S.colSts = detect(ALIASES.status);
+        S.colSch = detect(ALIASES.schedule);
+        S.colName = detect(ALIASES.name);
 
-  // 3. Services Filter
-  if(S.colSvc){
-    const svcs = [...new Set(S.all.map(r => r[S.colSvc] ?? '').filter(Boolean))].sort();
-    const fsvc = $('filter-service');
-    fsvc.innerHTML = '<option value="">Tất cả dịch vụ</option>';
-    svcs.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; fsvc.appendChild(o); });
-    $('filter-service-wrap').style.display = '';
-  } else {
-    $('filter-service-wrap').style.display = 'none';
-  }
+        // 4. Extract Data Rows with FORWARD-FILL for Date (Merged Cells handling)
+        let curDate = 'Chưa xác định';
+        const dataRows = [];
+        for (let rIdx = hi + 1; rIdx < rows.length; rIdx++) {
+          const rawR = rows[rIdx];
+          if (!rawR || !rawR.some(c => norm(c).length > 0)) continue;
 
-  // 4. Statuses Filter (Gom nhóm optgroup rõ ràng)
-  const fst = $('filter-status');
-  fst.innerHTML = '<option value="">Tất cả trạng thái (Tất cả nhóm)</option>';
+          // Helper to clean dates like '7/9alo/ Trâm...' -> '7/9'
+          function cleanDate(val) {
+            if (!val) return '';
+            const s = norm(val);
+            const m = s.match(/^(\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?)/);
+            return m ? m[1].replace('-', '/') : s;
+          }
 
-  // Group status items by their assigned group
-  const groupedStatuses = { g1: new Set(), g2: new Set(), g3: new Set(), g4: new Set() };
-  S.all.forEach(r => {
-    if(groupedStatuses[r._grp]) groupedStatuses[r._grp].add(r[S.colSts]);
-  });
+          // Check date forward fill
+          const dateIdx = cleanedHeaders.indexOf(S.colDate);
+          if (dateIdx >= 0 && norm(rawR[dateIdx])) {
+            curDate = cleanDate(rawR[dateIdx]);
+          }
 
-  ['g1', 'g2', 'g3', 'g4'].forEach(gid => {
-    const grp = GROUPS[gid];
-    const optgroup = document.createElement('optgroup');
-    optgroup.label = `${grp.icon} ${grp.name.toUpperCase()}`;
+          const rowObj = {};
+          cleanedHeaders.forEach((h, i) => {
+            let val = norm(rawR[i] ?? '');
+            if (h === S.colDate) {
+              val = cleanDate(val) || curDate;
+            }
+            rowObj[h] = val;
+          });
 
-    // Add option to select entire group
-    const grpAllOpt = document.createElement('option');
-    grpAllOpt.value = `__grp:${gid}`;
-    grpAllOpt.textContent = `👉 [Tất cả ${grp.name}]`;
-    grpAllOpt.style.fontWeight = 'bold';
-    optgroup.appendChild(grpAllOpt);
+          // Skip blank dummy rows with no name or status or source
+          dataRows.push(rowObj);
+        }
 
-    const stsList = [...groupedStatuses[gid]].sort();
-    stsList.forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s;
-      opt.textContent = s;
-      optgroup.appendChild(opt);
-    });
-    fst.appendChild(optgroup);
-  });
+        S.cols = cleanedHeaders;
+        S.all = dataRows;
+        resetColors();
 
-  // 4. Schedule Filter
-  if(S.colSch){
-    const schs = [...new Set(S.all.map(r => norm(r[S.colSch] ?? '')).filter(Boolean))].sort();
-    const fsch = $('filter-schedule');
-    fsch.innerHTML = '<option value="">Tất cả</option>';
-    schs.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; fsch.appendChild(o); });
-  }
-}
+        if (!S.colSrc || !S.colSts) {
+          openMapper(cleanedHeaders);
+        } else {
+          processData();
+        }
+      }
 
-// FILTER ROWS ACCORDING TO STATE
-function getFilteredRows(){
-  let rows = S.all;
+      // MAPPER SCREEN HANDLER
+      function openMapper(headers) {
+        const selects = [
+          { id: 'map-source', cur: S.colSrc },
+          { id: 'map-service', cur: S.colSvc },
+          { id: 'map-status', cur: S.colSts },
+          { id: 'map-date', cur: S.colDate },
+          { id: 'map-schedule', cur: S.colSch },
+          { id: 'map-name', cur: S.colName }
+        ];
 
-  // Date filter
-  if(S.fDate){
-    rows = rows.filter(r => r[S.colDate] === S.fDate);
-  }
+        selects.forEach(({ id, cur }) => {
+          const sel = $(id);
+          while (sel.children.length > 1) sel.removeChild(sel.lastChild);
+          headers.forEach(h => {
+            const opt = document.createElement('option');
+            opt.value = h; opt.textContent = h;
+            sel.appendChild(opt);
+          });
+          if (cur) sel.value = cur;
+        });
+        show('mapper');
+      }
 
-  // Quick group card filter
-  if(S.fGroup){
-    rows = rows.filter(r => r._grp === S.fGroup);
-  }
+      $('btn-mapper-confirm').addEventListener('click', () => {
+        const src = $('map-source').value, sts = $('map-status').value;
+        if (!src) { alert('Vui lòng chọn cột Nhân viên.'); return; }
+        if (!sts) { alert('Vui lòng chọn cột Trạng thái.'); return; }
+        S.colSrc = src;
+        S.colSvc = $('map-service').value || null;
+        S.colSts = sts;
+        S.colDate = $('map-date').value || S.colDate;
+        S.colSch = $('map-schedule').value || null;
+        S.colName = $('map-name').value || null;
+        processData();
+      });
+      $('btn-mapper-back').addEventListener('click', () => show('upload'));
 
-  // Search by employee name
-  if(S.fSearch.trim()){
-    const q = nk(S.fSearch.trim());
-    rows = rows.filter(r => nk(r[S.colSrc] ?? '').includes(q));
-  }
+      // PROCESS DATA & INITIALIZE FILTERS
+      function processData() {
+        showLoad('Đang phân tích 4 nhóm trạng thái...');
+        setTimeout(() => {
+          // Standardize all rows with _group assignment
+          S.all = S.all.map(row => {
+            const r = { ...row };
+            const rawSrc = r[S.colSrc] ?? '';
+            const rawSts = r[S.colSts] ?? '';
+            const rawSch = S.colSch ? (r[S.colSch] ?? '') : '';
+            const rawDate = S.colDate ? (r[S.colDate] ?? '') : '';
 
-  // Employee dropdown
-  if(S.fSrc){
-    rows = rows.filter(r => r[S.colSrc] === S.fSrc);
-  }
+            r[S.colSrc] = rawSrc.trim() === '' ? 'Không có nguồn' : rawSrc.trim();
+            r[S.colSts] = rawSts.trim() === '' ? 'Chưa xác định' : rawSts.trim();
+            r[S.colDate] = rawDate.trim() === '' ? 'Chưa xác định' : rawDate.trim();
 
-  // Service dropdown
-  if(S.fSvc && S.colSvc){
-    rows = rows.filter(r => (r[S.colSvc] ?? '') === S.fSvc);
-  }
+            // Assign status group ID (g1, g2, g3, g4)
+            r._grp = classifyStatus(r[S.colSts], rawSch);
+            return r;
+          });
 
-  // Status dropdown
-  if(S.fSts){
-    if(S.fSts.startsWith('__grp:')){
-      const gid = S.fSts.split(':')[1];
-      rows = rows.filter(r => r._grp === gid);
-    } else {
-      rows = rows.filter(r => r[S.colSts] === S.fSts);
-    }
-  }
+          populateFilters();
 
-  // Schedule dropdown
-  if(S.fSch && S.colSch){
-    rows = rows.filter(r => norm(r[S.colSch] ?? '') === S.fSch);
-  }
+          // Reset filters
+          S.fDates = []; S.fSearch = ''; S.fSrcs = []; S.fSvcs = []; S.fStss = []; S.fGroup = ''; S.fSchs = [];
+          S.sortCol = null; S.sortDir = 'asc'; S.page = 1; S.pageSize = 20;
+          $('page-size').value = '20';
 
-  return rows;
-}
+          $('file-name-display').textContent = S.fileName;
+          $('file-badge').classList.remove('hidden');
+          $('btn-export').classList.remove('hidden');
+          $('card-total-all').textContent = fmt(S.all.length);
+          $('card-g1-total-all').textContent = fmt(S.all.length);
+          $('group-filter-schedule').style.display = S.colSch ? '' : 'none';
+          $('group-filter-service').style.display = S.colSvc ? '' : 'none';
 
-// SORTING
-function getSortedRows(rows){
-  if(!S.sortCol) return rows;
-  return [...rows].sort((a, b) => {
-    const av = nk(a[S.sortCol] ?? ''), bv = nk(b[S.sortCol] ?? '');
-    const na = parseFloat(av), nb = parseFloat(bv);
-    let c = (!isNaN(na) && !isNaN(nb)) ? (na - nb) : av.localeCompare(bv, 'vi');
-    return S.sortDir === 'asc' ? c : -c;
-  });
-}
+          show('dash');
+          hideLoad();
+          update();
+        }, 60);
+      }
 
-// MAIN UPDATE CONTROLLER
-function update(){
-  const f = getFilteredRows();
-  const t = f.length;
+      // FILTER OPTIONS STORE & TEMP STATE FOR MODAL
+      const filterOptions = {
+        dates: [],
+        srcs: [],
+        svcs: [],
+        groupedSts: { g1: [], g2: [], g3: [], g4: [] },
+        schs: []
+      };
 
-  // Compute 4 Group Counts for filtered dataset
-  const grpCounts = { g1: 0, g2: 0, g3: 0, g4: 0 };
-  f.forEach(r => { if(grpCounts[r._grp] !== undefined) grpCounts[r._grp]++; });
+      const tempFilters = {
+        dates: new Set(),
+        srcs: new Set(),
+        svcs: new Set(),
+        stss: new Set(),
+        schs: new Set()
+      };
 
-  // Independent percentage for the exact status value 'đã đến' only
-  const daDenCount = f.filter(r => {
-    const st = norm(r[S.colSts] ?? '').toLowerCase();
-    return st.includes('đã đến') || st.includes('da den');
-  }).length;
-  const daDenPct = t > 0 ? (daDenCount / t * 100) : 0;
+      let dropdownListenersInitialized = false;
 
-  // Update Top Stat Cards
-  $('card-total').textContent = fmt(t);
-  $('card-g1-pct').textContent = pct(daDenPct);
-  $('card-g1-count').textContent = fmt(daDenCount);
-  $('card-g1-total-all').textContent = fmt(S.all.length);
-  $('card-active-date').textContent = S.fDate ? `Ngày ${S.fDate}` : 'Tất cả các ngày';
-  $('card-active-date-sub').textContent = S.fDate ? `${fmt(t)} khách hàng ghi nhận` : `Toàn bộ ${fmt(S.all.length)} khách`;
-  $('card-sources').textContent = fmt(new Set(f.map(r => r[S.colSrc])).size);
+      // POPULATE ALL FILTER DROPDOWNS
+      function populateFilters() {
+        function sortDates(a, b) {
+          const ma = a.match(/^(\d{1,2})[/-](\d{1,2})/);
+          const mb = b.match(/^(\d{1,2})[/-](\d{1,2})/);
+          if (ma && mb) {
+            const d1 = parseInt(ma[1]), m1 = parseInt(ma[2]);
+            const d2 = parseInt(mb[1]), m2 = parseInt(mb[2]);
+            if (m1 !== m2) return m1 - m2;
+            return d1 - d2;
+          }
+          return a.localeCompare(b, 'vi');
+        }
 
-  // Update 4 Interactive Group Cards
-  ['g1', 'g2', 'g3', 'g4'].forEach(gid => {
-    const count = grpCounts[gid];
-    const p = t > 0 ? (count / t * 100) : 0;
-    $(`count-grp-${gid}`).textContent = fmt(count);
-    $(`pct-grp-${gid}`).textContent = pct(p);
+        // 1. Dates
+        if (S.colDate) {
+          const dateCounts = {};
+          S.all.forEach(r => { const d = r[S.colDate]; dateCounts[d] = (dateCounts[d] || 0) + 1; });
+          const dates = Object.keys(dateCounts).sort(sortDates);
+          filterOptions.dates = dates.map(d => ({
+            val: d,
+            label: `Ngày ${d} (${fmt(dateCounts[d])} lead)`
+          }));
+        } else {
+          filterOptions.dates = [];
+        }
 
-    const card = $(`card-grp-${gid}`);
-    if(S.fGroup === gid){
-      card.classList.add('active');
-    } else {
-      card.classList.remove('active');
-    }
-  });
+        // 2. Sources (Employees)
+        const srcs = [...new Set(S.all.map(r => r[S.colSrc]))].sort();
+        filterOptions.srcs = srcs.map(s => ({ val: s, label: s }));
 
-  const clearBtn = $('group-clear-btn');
-  if(S.fGroup){
-    clearBtn.style.display = 'inline-block';
-  } else {
-    clearBtn.style.display = 'none';
-  }
+        // 3. Services
+        if (S.colSvc) {
+          const svcs = [...new Set(S.all.map(r => r[S.colSvc] ?? '').filter(Boolean))].sort();
+          filterOptions.svcs = svcs.map(s => ({ val: s, label: s }));
+          $('group-filter-service').style.display = '';
+        } else {
+          filterOptions.svcs = [];
+          $('group-filter-service').style.display = 'none';
+        }
 
-  renderActiveFilters();
-  renderDailyBreakdown();
-  renderStatusBreakdown(f);
-  renderDonut(grpCounts, t);
-  renderBarChart(f);
-  renderDataTable(f);
-}
+        // 4. Statuses (Grouped 4 Groups)
+        const groupedStatuses = { g1: new Set(), g2: new Set(), g3: new Set(), g4: new Set() };
+        S.all.forEach(r => {
+          if (groupedStatuses[r._grp]) groupedStatuses[r._grp].add(r[S.colSts]);
+        });
+        ['g1', 'g2', 'g3', 'g4'].forEach(gid => {
+          filterOptions.groupedSts[gid] = [...groupedStatuses[gid]].sort();
+        });
 
-// ACTIVE FILTER CHIPS
-function renderActiveFilters(){
-  const el = $('active-filters');
-  const chips = [];
+        // 5. Schedule
+        if (S.colSch) {
+          const schs = [...new Set(S.all.map(r => norm(r[S.colSch] ?? '')).filter(Boolean))].sort();
+          filterOptions.schs = schs.map(s => ({ val: s, label: s }));
+          $('group-filter-schedule').style.display = '';
+        } else {
+          filterOptions.schs = [];
+          $('group-filter-schedule').style.display = 'none';
+        }
 
-  if(S.fDate) chips.push({ l: `📅 Ngày ${S.fDate}`, k: 'date' });
-  if(S.fGroup) chips.push({ l: `🎯 ${GROUPS[S.fGroup].name}`, k: 'grp' });
-  if(S.fSearch) chips.push({ l: `🔎 "${S.fSearch}"`, k: 'search' });
-  if(S.fSrc) chips.push({ l: `👤 ${S.fSrc}`, k: 'src' });
-  if(S.fSvc) chips.push({ l: `🛎️ ${S.fSvc}`, k: 'svc' });
-  if(S.fSts){
-    const lbl = S.fSts.startsWith('__grp:') ? `📋 ${GROUPS[S.fSts.split(':')[1]].name}` : `📋 ${S.fSts}`;
-    chips.push({ l: lbl, k: 'sts' });
-  }
-  if(S.fSch) chips.push({ l: `⏰ ${S.fSch}`, k: 'sch' });
+        // Render DOM items inside Modal Dropdowns
+        renderFlatWidget('dates', 'ms-trigger-date', 'ms-text-date', 'ms-list-date', 'ms-search-date', filterOptions.dates, 'Tất cả các ngày', 'ngày');
+        renderFlatWidget('srcs', 'ms-trigger-source', 'ms-text-source', 'ms-list-source', 'ms-search-source', filterOptions.srcs, 'Tất cả nhân viên', 'nhân viên');
+        if (S.colSvc) {
+          renderFlatWidget('svcs', 'ms-trigger-service', 'ms-text-service', 'ms-list-service', 'ms-search-service', filterOptions.svcs, 'Tất cả dịch vụ', 'dịch vụ');
+        }
+        if (S.colSch) {
+          renderFlatWidget('schs', 'ms-trigger-schedule', 'ms-text-schedule', 'ms-list-schedule', 'ms-search-schedule', filterOptions.schs, 'Tất cả lịch hẹn', 'lịch hẹn');
+        }
+        renderStatusWidget();
 
-  if(!chips.length){ el.classList.add('hidden'); return; }
-  el.classList.remove('hidden');
-  el.innerHTML = `<span class="active-filters-label">Đang lọc:</span>` +
-    chips.map(c => `<span class="filter-badge" data-k="${c.k}">${esc(c.l)} <span>×</span></span>`).join('');
+        if (!dropdownListenersInitialized) {
+          setupDropdownToggles();
+          dropdownListenersInitialized = true;
+        }
+      }
 
-  el.querySelectorAll('.filter-badge').forEach(b => {
-    b.addEventListener('click', () => {
-      const k = b.dataset.k;
-      if(k === 'date'){ S.fDate = ''; $('filter-date').value = ''; }
-      if(k === 'grp'){ S.fGroup = ''; }
-      if(k === 'search'){ S.fSearch = ''; $('filter-search').value = ''; }
-      if(k === 'src'){ S.fSrc = ''; $('filter-source').value = ''; }
-      if(k === 'svc'){ S.fSvc = ''; $('filter-service').value = ''; }
-      if(k === 'sts'){ S.fSts = ''; $('filter-status').value = ''; }
-      if(k === 'sch'){ S.fSch = ''; if($('filter-schedule')) $('filter-schedule').value = ''; }
-      S.page = 1; update();
-    });
-  });
-}
+      // RENDER FLAT MULTI-SELECT WIDGET
+      function renderFlatWidget(key, triggerId, textId, listId, searchId, options, allLabel, nounLabel) {
+        const listEl = $(listId);
+        listEl.innerHTML = '';
 
-// DAILY ANALYSIS BREAKDOWN TABLE (Phân tích theo từng ngày)
-function renderDailyBreakdown(){
-  const tbody = $('daily-tbody');
-  if(!S.colDate){
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray-400);padding:20px;">Không tìm thấy cột ngày trong file.</td></tr>';
-    return;
-  }
+        // "Tất cả..." Special Option
+        const allItem = document.createElement('div');
+        allItem.className = 'ms-option-item is-special';
+        allItem.dataset.val = '__all__';
+        allItem.innerHTML = `<input type="checkbox" /><span class="ms-option-text">${esc(allLabel)}</span>`;
+        allItem.addEventListener('click', (e) => {
+          e.stopPropagation();
+          tempFilters[key].clear();
+          syncFlatWidget(key, textId, listId, options, allLabel, nounLabel);
+        });
+        listEl.appendChild(allItem);
 
-  // Group base rows by date (respecting non-date filters like Employee)
-  let baseRows = S.all;
-  if(S.fSearch.trim()){
-    const q = nk(S.fSearch.trim());
-    baseRows = baseRows.filter(r => nk(r[S.colSrc] ?? '').includes(q));
-  }
-  if(S.fSrc) baseRows = baseRows.filter(r => r[S.colSrc] === S.fSrc);
+        // Concrete Options
+        options.forEach((opt, idx) => {
+          const item = document.createElement('div');
+          item.className = 'ms-option-item';
+          item.dataset.val = opt.val;
+          item.innerHTML = `<input type="checkbox" /><span class="ms-option-text">${esc(opt.label)}</span>`;
+          item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (tempFilters[key].has(opt.val)) {
+              tempFilters[key].delete(opt.val);
+            } else {
+              tempFilters[key].add(opt.val);
+            }
+            syncFlatWidget(key, textId, listId, options, allLabel, nounLabel);
+          });
+          listEl.appendChild(item);
+        });
 
-  const datesMap = {};
-  baseRows.forEach(r => {
-    const d = r[S.colDate] || 'Chưa xác định';
-    if(!datesMap[d]){
-      datesMap[d] = { date: d, total: 0, g1: 0, g2: 0, g3: 0, g4: 0 };
-    }
-    datesMap[d].total++;
-    datesMap[d][r._grp]++;
-  });
+        // Search input filtering
+        const searchInput = $(searchId);
+        if (searchInput) {
+          searchInput.value = '';
+          searchInput.oninput = (e) => {
+            const q = nk(e.target.value);
+            listEl.querySelectorAll('.ms-option-item:not(.is-special)').forEach(it => {
+              const txt = nk(it.querySelector('.ms-option-text').textContent);
+              it.style.display = txt.includes(q) ? 'flex' : 'none';
+            });
+          };
+        }
 
-  const datesList = Object.values(datesMap).sort((a, b) => {
-    const ma = a.date.match(/^(\d{1,2})[/-](\d{1,2})/);
-    const mb = b.date.match(/^(\d{1,2})[/-](\d{1,2})/);
-    if(ma && mb){
-      const d1 = parseInt(ma[1]), m1 = parseInt(ma[2]);
-      const d2 = parseInt(mb[1]), m2 = parseInt(mb[2]);
-      if(m1 !== m2) return m1 - m2;
-      return d1 - d2;
-    }
-    return a.date.localeCompare(b.date, 'vi');
-  });
-  if(!datesList.length){
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray-400);padding:24px;">Không có dữ liệu theo ngày</td></tr>';
-    $('daily-summary-info').textContent = '';
-    return;
-  }
+        syncFlatWidget(key, textId, listId, options, allLabel, nounLabel);
+      }
 
-  $('daily-summary-info').textContent = `Tổng ${datesList.length} ngày ghi nhận`;
+      // SYNC STATE & LABELS FOR FLAT MULTI-SELECT
+      function syncFlatWidget(key, textId, listId, options, allLabel, nounLabel) {
+        const listEl = $(listId);
+        const textEl = $(textId);
+        if (!listEl || !textEl) return;
+        const selectedCount = tempFilters[key].size;
 
-  tbody.innerHTML = datesList.map(item => {
-    const isCurDate = S.fDate === item.date;
-    const g1p = item.total > 0 ? (item.g1 / item.total * 100) : 0;
-    const g2p = item.total > 0 ? (item.g2 / item.total * 100) : 0;
-    const g3p = item.total > 0 ? (item.g3 / item.total * 100) : 0;
-    const g4p = item.total > 0 ? (item.g4 / item.total * 100) : 0;
+        // Sync "Tất cả" Checkbox
+        const allItem = listEl.querySelector('.is-special');
+        if (allItem) {
+          const isAll = (selectedCount === 0);
+          allItem.querySelector('input').checked = isAll;
+          allItem.classList.toggle('selected', isAll);
+        }
 
-    return `<tr class="${isCurDate ? 'active-date' : ''}">
+        // Sync Specific Item Checkboxes
+        listEl.querySelectorAll('.ms-option-item:not(.is-special)').forEach(it => {
+          const val = it.dataset.val;
+          const isChecked = tempFilters[key].has(val);
+          const chk = it.querySelector('input');
+          if (chk) chk.checked = isChecked;
+          it.classList.toggle('selected', isChecked);
+        });
+
+        // Sync Trigger Label
+        if (selectedCount === 0) {
+          textEl.textContent = allLabel;
+          textEl.className = 'ms-trigger-text is-all';
+        } else if (selectedCount === 1) {
+          const firstVal = Array.from(tempFilters[key])[0];
+          const found = options.find(o => o.val === firstVal);
+          textEl.textContent = `1 ${nounLabel}: ${found ? found.val : firstVal}`;
+          textEl.className = 'ms-trigger-text is-selected';
+        } else {
+          textEl.textContent = `Đã chọn ${selectedCount} ${nounLabel}`;
+          textEl.className = 'ms-trigger-text is-selected';
+        }
+      }
+
+      // RENDER GROUPED STATUS WIDGET
+      function renderStatusWidget() {
+        const listEl = $('ms-list-status');
+        listEl.innerHTML = '';
+
+        // "Tất cả trạng thái" Special Option
+        const allItem = document.createElement('div');
+        allItem.className = 'ms-option-item is-special';
+        allItem.dataset.val = '__all__';
+        allItem.innerHTML = `<input type="checkbox" /><span class="ms-option-text">Tất cả trạng thái (Tất cả nhóm)</span>`;
+        allItem.addEventListener('click', (e) => {
+          e.stopPropagation();
+          tempFilters.stss.clear();
+          syncStatusWidget();
+        });
+        listEl.appendChild(allItem);
+
+        // 4 Groups
+        ['g1', 'g2', 'g3', 'g4'].forEach(gid => {
+          const grp = GROUPS[gid];
+          const list = filterOptions.groupedSts[gid] || [];
+          if (!list.length) return;
+
+          // Group Header with Checkbox
+          const header = document.createElement('div');
+          header.className = 'ms-group-header';
+          header.dataset.gid = gid;
+          header.innerHTML = `
+      <label class="ms-group-check-wrap">
+        <input type="checkbox" class="ms-grp-chk" data-gid="${gid}" />
+        <span>${grp.icon} ${grp.name}</span>
+      </label>
+      <span style="font-size:10px;font-weight:700;color:${grp.badge};">${list.length} trạng thái</span>
+    `;
+
+          const grpChk = header.querySelector('.ms-grp-chk');
+          grpChk.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const allIn = list.every(s => tempFilters.stss.has(s));
+            if (allIn) {
+              list.forEach(s => tempFilters.stss.delete(s));
+            } else {
+              list.forEach(s => tempFilters.stss.add(s));
+            }
+            syncStatusWidget();
+          });
+          listEl.appendChild(header);
+
+          // Child Statuses
+          list.forEach(s => {
+            const item = document.createElement('div');
+            item.className = 'ms-option-item ms-child-item';
+            item.dataset.val = s;
+            item.dataset.gid = gid;
+            item.innerHTML = `<input type="checkbox" class="ms-sts-chk" /><span class="ms-option-text">${esc(s)}</span>`;
+            item.addEventListener('click', (e) => {
+              e.stopPropagation();
+              if (tempFilters.stss.has(s)) {
+                tempFilters.stss.delete(s);
+              } else {
+                tempFilters.stss.add(s);
+              }
+              syncStatusWidget();
+            });
+            listEl.appendChild(item);
+          });
+        });
+
+        // Search input filtering
+        const searchInput = $('ms-search-status');
+        if (searchInput) {
+          searchInput.value = '';
+          searchInput.oninput = (e) => {
+            const q = nk(e.target.value);
+            const visiblePerGrp = { g1: 0, g2: 0, g3: 0, g4: 0 };
+            listEl.querySelectorAll('.ms-child-item').forEach(it => {
+              const txt = nk(it.dataset.val);
+              const isVisible = txt.includes(q);
+              it.style.display = isVisible ? 'flex' : 'none';
+              if (isVisible) visiblePerGrp[it.dataset.gid]++;
+            });
+
+            listEl.querySelectorAll('.ms-group-header').forEach(hdr => {
+              const gid = hdr.dataset.gid;
+              hdr.style.display = (visiblePerGrp[gid] > 0 || !q) ? 'flex' : 'none';
+            });
+          };
+        }
+
+        syncStatusWidget();
+      }
+
+      // SYNC STATE & LABELS FOR STATUS WIDGET
+      function syncStatusWidget() {
+        const listEl = $('ms-list-status');
+        const textEl = $('ms-text-status');
+        if (!listEl || !textEl) return;
+        const selectedCount = tempFilters.stss.size;
+
+        // Sync "Tất cả" Checkbox
+        const allItem = listEl.querySelector('.is-special');
+        if (allItem) {
+          const isAll = (selectedCount === 0);
+          allItem.querySelector('input').checked = isAll;
+          allItem.classList.toggle('selected', isAll);
+        }
+
+        // Sync Group Checkboxes
+        ['g1', 'g2', 'g3', 'g4'].forEach(gid => {
+          const list = filterOptions.groupedSts[gid] || [];
+          const grpHdr = listEl.querySelector(`.ms-group-header[data-gid="${gid}"]`);
+          if (grpHdr && list.length > 0) {
+            const grpChk = grpHdr.querySelector('.ms-grp-chk');
+            const inCount = list.filter(s => tempFilters.stss.has(s)).length;
+            grpChk.checked = (inCount === list.length && list.length > 0);
+            grpChk.indeterminate = (inCount > 0 && inCount < list.length);
+          }
+        });
+
+        // Sync Child Item Checkboxes
+        listEl.querySelectorAll('.ms-child-item').forEach(it => {
+          const val = it.dataset.val;
+          const isChecked = tempFilters.stss.has(val);
+          const chk = it.querySelector('input');
+          if (chk) chk.checked = isChecked;
+          it.classList.toggle('selected', isChecked);
+        });
+
+        // Sync Trigger Label
+        if (selectedCount === 0) {
+          textEl.textContent = 'Tất cả trạng thái (Tất cả nhóm)';
+          textEl.className = 'ms-trigger-text is-all';
+        } else if (selectedCount === 1) {
+          const firstVal = Array.from(tempFilters.stss)[0];
+          textEl.textContent = `1 trạng thái: ${firstVal}`;
+          textEl.className = 'ms-trigger-text is-selected';
+        } else {
+          textEl.textContent = `Đã chọn ${selectedCount} trạng thái`;
+          textEl.className = 'ms-trigger-text is-selected';
+        }
+      }
+
+      // SETUP DROPDOWN TOGGLES AND CLICK-OUTSIDE
+      function setupDropdownToggles() {
+        const widgets = [
+          { trigger: 'ms-trigger-date', widget: 'ms-widget-date', search: 'ms-search-date' },
+          { trigger: 'ms-trigger-source', widget: 'ms-widget-source', search: 'ms-search-source' },
+          { trigger: 'ms-trigger-service', widget: 'ms-widget-service', search: 'ms-search-service' },
+          { trigger: 'ms-trigger-schedule', widget: 'ms-widget-schedule', search: 'ms-search-schedule' },
+          { trigger: 'ms-trigger-status', widget: 'ms-widget-status', search: 'ms-search-status' }
+        ];
+
+        widgets.forEach(({ trigger, widget, search }) => {
+          const trgEl = $(trigger);
+          const wdgEl = $(widget);
+          if (!trgEl || !wdgEl) return;
+
+          trgEl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const wasOpen = wdgEl.classList.contains('open');
+            closeAllDropdowns();
+            if (!wasOpen) {
+              wdgEl.classList.add('open');
+              const sEl = $(search);
+              if (sEl) setTimeout(() => sEl.focus(), 60);
+            }
+          });
+
+          const dropEl = wdgEl.querySelector('.ms-dropdown');
+          if (dropEl) {
+            dropEl.addEventListener('click', (e) => {
+              e.stopPropagation();
+            });
+          }
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.ms-widget')) {
+            closeAllDropdowns();
+          }
+        });
+      }
+
+      function closeAllDropdowns() {
+        document.querySelectorAll('.ms-widget.open').forEach(w => w.classList.remove('open'));
+      }
+
+      // FILTER ROWS ACCORDING TO STATE (MULTI-SELECT SUPPORT)
+      function getFilteredRows() {
+        let rows = S.all;
+
+        // 1. Date filter (multi-select)
+        if (S.fDates && S.fDates.length > 0 && S.colDate) {
+          const dSet = new Set(S.fDates);
+          rows = rows.filter(r => dSet.has(r[S.colDate]));
+        }
+
+        // 2. Quick group card filter
+        if (S.fGroup) {
+          rows = rows.filter(r => r._grp === S.fGroup);
+        }
+
+        // 3. Employee Search query
+        if (S.fSearch && S.fSearch.trim()) {
+          const q = nk(S.fSearch.trim());
+          rows = rows.filter(r => nk(r[S.colSrc] ?? '').includes(q));
+        }
+
+        // 4. Employee / Source multi-select
+        if (S.fSrcs && S.fSrcs.length > 0 && S.colSrc) {
+          const srcSet = new Set(S.fSrcs);
+          rows = rows.filter(r => srcSet.has(r[S.colSrc]));
+        }
+
+        // 5. Service multi-select
+        if (S.fSvcs && S.fSvcs.length > 0 && S.colSvc) {
+          const svcSet = new Set(S.fSvcs);
+          rows = rows.filter(r => svcSet.has(r[S.colSvc] ?? ''));
+        }
+
+        // 6. Status multi-select
+        if (S.fStss && S.fStss.length > 0 && S.colSts) {
+          const stsSet = new Set(S.fStss);
+          rows = rows.filter(r => stsSet.has(r[S.colSts]));
+        }
+
+        // 7. Schedule multi-select
+        if (S.fSchs && S.fSchs.length > 0 && S.colSch) {
+          const schSet = new Set(S.fSchs);
+          rows = rows.filter(r => schSet.has(norm(r[S.colSch] ?? '')));
+        }
+
+        return rows;
+      }
+
+      // SORTING
+      function getSortedRows(rows) {
+        if (!S.sortCol) return rows;
+        return [...rows].sort((a, b) => {
+          const av = nk(a[S.sortCol] ?? ''), bv = nk(b[S.sortCol] ?? '');
+          const na = parseFloat(av), nb = parseFloat(bv);
+          let c = (!isNaN(na) && !isNaN(nb)) ? (na - nb) : av.localeCompare(bv, 'vi');
+          return S.sortDir === 'asc' ? c : -c;
+        });
+      }
+
+      // MAIN UPDATE CONTROLLER
+      function update() {
+        const f = getFilteredRows();
+        const t = f.length;
+
+        // Compute 4 Group Counts for filtered dataset
+        const grpCounts = { g1: 0, g2: 0, g3: 0, g4: 0 };
+        f.forEach(r => { if (grpCounts[r._grp] !== undefined) grpCounts[r._grp]++; });
+
+        // Independent percentage for the exact status value 'đã đến' only
+        const daDenCount = f.filter(r => {
+          const st = norm(r[S.colSts] ?? '').toLowerCase();
+          return st.includes('đã đến') || st.includes('da den');
+        }).length;
+        const daDenPct = t > 0 ? (daDenCount / t * 100) : 0;
+
+        // Update Top Stat Cards
+        $('card-total').textContent = fmt(t);
+        $('card-g1-pct').textContent = pct(daDenPct);
+        $('card-g1-count').textContent = fmt(daDenCount);
+        $('card-g1-total-all').textContent = fmt(S.all.length);
+        const dateTitle = S.fDates.length === 0
+          ? 'Tất cả các ngày'
+          : (S.fDates.length === 1 ? `Ngày ${S.fDates[0]}` : `${S.fDates.length} ngày đã chọn`);
+        $('card-active-date').textContent = dateTitle;
+        $('card-active-date-sub').textContent = S.fDates.length > 0 ? `${fmt(t)} khách hàng ghi nhận` : `Toàn bộ ${fmt(S.all.length)} khách`;
+        $('card-sources').textContent = fmt(new Set(f.map(r => r[S.colSrc])).size);
+
+        // Update 4 Interactive Group Cards
+        ['g1', 'g2', 'g3', 'g4'].forEach(gid => {
+          const count = grpCounts[gid];
+          const p = t > 0 ? (count / t * 100) : 0;
+          $(`count-grp-${gid}`).textContent = fmt(count);
+          $(`pct-grp-${gid}`).textContent = pct(p);
+
+          const card = $(`card-grp-${gid}`);
+          if (S.fGroup === gid) {
+            card.classList.add('active');
+          } else {
+            card.classList.remove('active');
+          }
+        });
+
+        const clearBtn = $('group-clear-btn');
+        if (S.fGroup) {
+          clearBtn.style.display = 'inline-block';
+        } else {
+          clearBtn.style.display = 'none';
+        }
+
+        renderActiveFilters();
+        renderDailyBreakdown();
+        renderStatusBreakdown(f);
+        renderDonut(grpCounts, t);
+        renderBarChart(f);
+        renderDataTable(f);
+      }
+
+      // ACTIVE FILTER CHIPS & BUTTON STATE
+      function renderActiveFilters() {
+        const el = $('active-filters');
+        const chips = [];
+        const summaryParts = [];
+        let activeCount = 0;
+
+        // 1. Dates
+        if (S.fDates && S.fDates.length > 0) {
+          activeCount++;
+          summaryParts.push(`${S.fDates.length} ngày`);
+          S.fDates.forEach(d => {
+            chips.push({ l: `📅 Ngày ${d}`, k: 'date', val: d });
+          });
+        }
+
+        // 2. Employees (Sources)
+        if (S.fSrcs && S.fSrcs.length > 0) {
+          activeCount++;
+          summaryParts.push(`${S.fSrcs.length} nhân viên`);
+          S.fSrcs.forEach(src => {
+            chips.push({ l: `👤 ${src}`, k: 'src', val: src });
+          });
+        }
+
+        // 3. Search query
+        if (S.fSearch && S.fSearch.trim()) {
+          chips.push({ l: `🔎 "${S.fSearch.trim()}"`, k: 'search', val: S.fSearch });
+        }
+
+        // 4. Services
+        if (S.fSvcs && S.fSvcs.length > 0) {
+          activeCount++;
+          summaryParts.push(`${S.fSvcs.length} dịch vụ`);
+          S.fSvcs.forEach(svc => {
+            chips.push({ l: `🛎️ ${svc}`, k: 'svc', val: svc });
+          });
+        }
+
+        // 5. Statuses
+        if (S.fStss && S.fStss.length > 0) {
+          activeCount++;
+          summaryParts.push(`${S.fStss.length} trạng thái`);
+          S.fStss.forEach(sts => {
+            chips.push({ l: `📋 ${sts}`, k: 'sts', val: sts });
+          });
+        }
+
+        // 6. Schedule
+        if (S.fSchs && S.fSchs.length > 0) {
+          activeCount++;
+          summaryParts.push(`${S.fSchs.length} lịch hẹn`);
+          S.fSchs.forEach(sch => {
+            chips.push({ l: `⏰ ${sch}`, k: 'sch', val: sch });
+          });
+        }
+
+        // 7. Group card filter
+        if (S.fGroup) {
+          activeCount++;
+          chips.push({ l: `🎯 ${GROUPS[S.fGroup].name}`, k: 'grp', val: S.fGroup });
+        }
+
+        // Update Main Trigger Button & Summary
+        const triggerBtn = $('btn-open-filter-modal');
+        const badge = $('filter-active-count');
+        const summaryEl = $('filter-summary-text');
+        const quickResetBtn = $('btn-quick-reset');
+
+        if (activeCount > 0) {
+          triggerBtn.classList.add('has-active');
+          badge.textContent = activeCount;
+          badge.classList.remove('hidden');
+          if (summaryParts.length > 0) {
+            summaryEl.innerHTML = `Đang áp dụng: <strong>${esc(summaryParts.join(' • '))}</strong>`;
+          } else {
+            summaryEl.textContent = '';
+          }
+          if (quickResetBtn) quickResetBtn.classList.remove('hidden');
+        } else {
+          triggerBtn.classList.remove('has-active');
+          badge.textContent = '0';
+          badge.classList.add('hidden');
+          summaryEl.textContent = '';
+          if (quickResetBtn) quickResetBtn.classList.add('hidden');
+        }
+
+        if (!chips.length) {
+          el.classList.add('hidden');
+          return;
+        }
+        el.classList.remove('hidden');
+        el.innerHTML = `<span class="active-filters-label">Đang lọc (${chips.length}):</span>` +
+          chips.map(c => `<span class="filter-badge" data-k="${c.k}" data-val="${esc(c.val || '')}" title="Click để xóa">${esc(c.l)} <span>&times;</span></span>`).join('');
+
+        el.querySelectorAll('.filter-badge').forEach(b => {
+          b.addEventListener('click', () => {
+            const k = b.dataset.k;
+            const val = b.dataset.val;
+            if (k === 'date') { S.fDates = S.fDates.filter(x => x !== val); }
+            if (k === 'src') { S.fSrcs = S.fSrcs.filter(x => x !== val); }
+            if (k === 'svc') { S.fSvcs = S.fSvcs.filter(x => x !== val); }
+            if (k === 'sts') { S.fStss = S.fStss.filter(x => x !== val); }
+            if (k === 'sch') { S.fSchs = S.fSchs.filter(x => x !== val); }
+            if (k === 'grp') { S.fGroup = ''; }
+            if (k === 'search') { S.fSearch = ''; }
+            S.page = 1;
+            update();
+          });
+        });
+      }
+
+      // DAILY ANALYSIS BREAKDOWN TABLE (Phân tích theo từng ngày)
+      function renderDailyBreakdown() {
+        const tbody = $('daily-tbody');
+        if (!S.colDate) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray-400);padding:20px;">Không tìm thấy cột ngày trong file.</td></tr>';
+          return;
+        }
+
+        // Group base rows by date (respecting non-date filters like Employee)
+        let baseRows = S.all;
+        if (S.fSearch && S.fSearch.trim()) {
+          const q = nk(S.fSearch.trim());
+          baseRows = baseRows.filter(r => nk(r[S.colSrc] ?? '').includes(q));
+        }
+        if (S.fSrcs && S.fSrcs.length > 0 && S.colSrc) {
+          const srcSet = new Set(S.fSrcs);
+          baseRows = baseRows.filter(r => srcSet.has(r[S.colSrc]));
+        }
+        if (S.fSvcs && S.fSvcs.length > 0 && S.colSvc) {
+          const svcSet = new Set(S.fSvcs);
+          baseRows = baseRows.filter(r => svcSet.has(r[S.colSvc] ?? ''));
+        }
+        if (S.fStss && S.fStss.length > 0 && S.colSts) {
+          const stsSet = new Set(S.fStss);
+          baseRows = baseRows.filter(r => stsSet.has(r[S.colSts]));
+        }
+        if (S.fSchs && S.fSchs.length > 0 && S.colSch) {
+          const schSet = new Set(S.fSchs);
+          baseRows = baseRows.filter(r => schSet.has(norm(r[S.colSch] ?? '')));
+        }
+
+        const datesMap = {};
+        baseRows.forEach(r => {
+          const d = r[S.colDate] || 'Chưa xác định';
+          if (!datesMap[d]) {
+            datesMap[d] = { date: d, total: 0, g1: 0, g2: 0, g3: 0, g4: 0 };
+          }
+          datesMap[d].total++;
+          datesMap[d][r._grp]++;
+        });
+
+        const datesList = Object.values(datesMap).sort((a, b) => {
+          const ma = a.date.match(/^(\d{1,2})[/-](\d{1,2})/);
+          const mb = b.date.match(/^(\d{1,2})[/-](\d{1,2})/);
+          if (ma && mb) {
+            const d1 = parseInt(ma[1]), m1 = parseInt(ma[2]);
+            const d2 = parseInt(mb[1]), m2 = parseInt(mb[2]);
+            if (m1 !== m2) return m1 - m2;
+            return d1 - d2;
+          }
+          return a.date.localeCompare(b.date, 'vi');
+        });
+        if (!datesList.length) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray-400);padding:24px;">Không có dữ liệu theo ngày</td></tr>';
+          $('daily-summary-info').textContent = '';
+          return;
+        }
+
+        $('daily-summary-info').textContent = `Tổng ${datesList.length} ngày ghi nhận`;
+
+        tbody.innerHTML = datesList.map(item => {
+          const isCurDate = S.fDates.includes(item.date);
+          const g1p = item.total > 0 ? (item.g1 / item.total * 100) : 0;
+          const g2p = item.total > 0 ? (item.g2 / item.total * 100) : 0;
+          const g3p = item.total > 0 ? (item.g3 / item.total * 100) : 0;
+          const g4p = item.total > 0 ? (item.g4 / item.total * 100) : 0;
+
+          return `<tr class="${isCurDate ? 'active-date' : ''}">
       <td><strong style="color:var(--gray-900);">📅 Ngày ${esc(item.date)}</strong></td>
       <td style="text-align:right;font-weight:700;">${fmt(item.total)}</td>
       <td>
@@ -1300,47 +3358,45 @@ function renderDailyBreakdown(){
         </button>
       </td>
     </tr>`;
-  }).join('');
+        }).join('');
 
-  // Row click / button click handlers
-  tbody.querySelectorAll('.btn-select-date').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const d = btn.dataset.date;
-      if(S.fDate === d){
-        S.fDate = '';
-        $('filter-date').value = '';
-      } else {
-        S.fDate = d;
-        $('filter-date').value = d;
+        // Row click / button click handlers
+        tbody.querySelectorAll('.btn-select-date').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const d = btn.dataset.date;
+            if (S.fDates.length === 1 && S.fDates[0] === d) {
+              S.fDates = [];
+            } else {
+              S.fDates = [d];
+            }
+            S.page = 1;
+            update();
+          });
+        });
       }
-      S.page = 1;
-      update();
-    });
-  });
-}
 
-// STATUS BREAKDOWN TABLE (Toggle between 4 Groups and Detailed Statuses)
-function renderStatusBreakdown(f){
-  const t = f.length;
-  $('status-table-info').textContent = `${fmt(t)} dòng`;
-  const tbody = $('status-tbody'), tfoot = $('status-tfoot');
+      // STATUS BREAKDOWN TABLE (Toggle between 4 Groups and Detailed Statuses)
+      function renderStatusBreakdown(f) {
+        const t = f.length;
+        $('status-table-info').textContent = `${fmt(t)} dòng`;
+        const tbody = $('status-tbody'), tfoot = $('status-tfoot');
 
-  if(t === 0){
-    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--gray-400);padding:24px;">Không có dữ liệu</td></tr>`;
-    tfoot.innerHTML = '';
-    return;
-  }
+        if (t === 0) {
+          tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--gray-400);padding:24px;">Không có dữ liệu</td></tr>`;
+          tfoot.innerHTML = '';
+          return;
+        }
 
-  if(S.statusViewMode === 'groups'){
-    // View as 4 Groups
-    const counts = { g1: 0, g2: 0, g3: 0, g4: 0 };
-    f.forEach(r => { counts[r._grp]++; });
+        if (S.statusViewMode === 'groups') {
+          // View as 4 Groups
+          const counts = { g1: 0, g2: 0, g3: 0, g4: 0 };
+          f.forEach(r => { counts[r._grp]++; });
 
-    tbody.innerHTML = ['g1', 'g2', 'g3', 'g4'].map(gid => {
-      const grp = GROUPS[gid];
-      const count = counts[gid];
-      const p = t > 0 ? (count / t * 100) : 0;
-      return `<tr style="cursor:pointer;" class="status-row-click" data-grp="${gid}">
+          tbody.innerHTML = ['g1', 'g2', 'g3', 'g4'].map(gid => {
+            const grp = GROUPS[gid];
+            const count = counts[gid];
+            const p = t > 0 ? (count / t * 100) : 0;
+            return `<tr style="cursor:pointer;" class="status-row-click" data-grp="${gid}">
         <td>
           <div style="display:flex;align-items:center;gap:8px;">
             <span class="color-dot" style="background:${grp.badge}"></span>
@@ -1358,33 +3414,33 @@ function renderStatusBreakdown(f){
           </div>
         </td>
       </tr>`;
-    }).join('');
+          }).join('');
 
-    tbody.querySelectorAll('.status-row-click').forEach(r => {
-      r.addEventListener('click', () => {
-        const gid = r.dataset.grp;
-        S.fGroup = S.fGroup === gid ? '' : gid;
-        S.page = 1; update();
-      });
-    });
+          tbody.querySelectorAll('.status-row-click').forEach(r => {
+            r.addEventListener('click', () => {
+              const gid = r.dataset.grp;
+              S.fGroup = S.fGroup === gid ? '' : gid;
+              S.page = 1; update();
+            });
+          });
 
-  } else {
-    // Detailed Status view
-    const stsMap = {};
-    f.forEach(r => {
-      const s = r[S.colSts];
-      if(!stsMap[s]) stsMap[s] = { s, count: 0, grp: r._grp };
-      stsMap[s].count++;
-    });
+        } else {
+          // Detailed Status view
+          const stsMap = {};
+          f.forEach(r => {
+            const s = r[S.colSts];
+            if (!stsMap[s]) stsMap[s] = { s, count: 0, grp: r._grp };
+            stsMap[s].count++;
+          });
 
-    const sortedSts = Object.values(stsMap).sort((a, b) => b.count - a.count);
+          const sortedSts = Object.values(stsMap).sort((a, b) => b.count - a.count);
 
-    tbody.innerHTML = sortedSts.map(({ s, count, grp }) => {
-      const p = t > 0 ? (count / t * 100) : 0;
-      const grpInfo = GROUPS[grp] || GROUPS.g4;
-      const c = gc(s);
+          tbody.innerHTML = sortedSts.map(({ s, count, grp }) => {
+            const p = t > 0 ? (count / t * 100) : 0;
+            const grpInfo = GROUPS[grp] || GROUPS.g4;
+            const c = gc(s);
 
-      return `<tr>
+            return `<tr>
         <td>
           <div style="display:flex;align-items:center;gap:8px;">
             <span class="color-dot" style="background:${c}"></span>
@@ -1402,198 +3458,198 @@ function renderStatusBreakdown(f){
           </div>
         </td>
       </tr>`;
-    }).join('');
-  }
+          }).join('');
+        }
 
-  tfoot.innerHTML = `<tr><td style="font-weight:700">Tổng cộng</td><td style="text-align:right;font-weight:700">${fmt(t)}</td><td><span class="pct-text" style="font-weight:700">100%</span></td></tr>`;
-}
+        tfoot.innerHTML = `<tr><td style="font-weight:700">Tổng cộng</td><td style="text-align:right;font-weight:700">${fmt(t)}</td><td><span class="pct-text" style="font-weight:700">100%</span></td></tr>`;
+      }
 
-// DONUT CHART RENDER (Showing 4 Groups)
-function renderDonut(grpCounts, t){
-  const con = $('donut-container');
-  if(t === 0){
-    con.innerHTML = '<div class="empty-state"><span class="empty-state-icon">📊</span><h3>Không có dữ liệu</h3></div>';
-    return;
-  }
+      // DONUT CHART RENDER (Showing 4 Groups)
+      function renderDonut(grpCounts, t) {
+        const con = $('donut-container');
+        if (t === 0) {
+          con.innerHTML = '<div class="empty-state"><span class="empty-state-icon">📊</span><h3>Không có dữ liệu</h3></div>';
+          return;
+        }
 
-  const sz = 240, cx = 120, cy = 120, or = 92, ir = 54;
-  let ca = -Math.PI / 2;
+        const sz = 240, cx = 120, cy = 120, or = 92, ir = 54;
+        let ca = -Math.PI / 2;
 
-  function p2c(r, a){ return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }; }
-  function arc(r1, r2, sa, ea){
-    const o1 = p2c(r1, sa), o2 = p2c(r1, ea), i1 = p2c(r2, sa), i2 = p2c(r2, ea);
-    const lg = ea - sa > Math.PI ? 1 : 0;
-    return `M${o1.x} ${o1.y} A${r1} ${r1} 0 ${lg} 1 ${o2.x} ${o2.y} L${i2.x} ${i2.y} A${r2} ${r2} 0 ${lg} 0 ${i1.x} ${i1.y}Z`;
-  }
+        function p2c(r, a) { return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }; }
+        function arc(r1, r2, sa, ea) {
+          const o1 = p2c(r1, sa), o2 = p2c(r1, ea), i1 = p2c(r2, sa), i2 = p2c(r2, ea);
+          const lg = ea - sa > Math.PI ? 1 : 0;
+          return `M${o1.x} ${o1.y} A${r1} ${r1} 0 ${lg} 1 ${o2.x} ${o2.y} L${i2.x} ${i2.y} A${r2} ${r2} 0 ${lg} 0 ${i1.x} ${i1.y}Z`;
+        }
 
-  const paths = ['g1', 'g2', 'g3', 'g4'].map(gid => {
-    const count = grpCounts[gid];
-    if(count === 0) return '';
-    const angle = (count / t) * 2 * Math.PI;
-    const sa = ca; ca += angle; const ea = ca;
-    const grp = GROUPS[gid];
-    const ps = grp.name;
-    const p = (count / t * 100).toFixed(1);
+        const paths = ['g1', 'g2', 'g3', 'g4'].map(gid => {
+          const count = grpCounts[gid];
+          if (count === 0) return '';
+          const angle = (count / t) * 2 * Math.PI;
+          const sa = ca; ca += angle; const ea = ca;
+          const grp = GROUPS[gid];
+          const ps = grp.name;
+          const p = (count / t * 100).toFixed(1);
 
-    return `<path d="${arc(or, ir, sa, ea)}" fill="${grp.badge}" stroke="white" stroke-width="2"
+          return `<path d="${arc(or, ir, sa, ea)}" fill="${grp.badge}" stroke="white" stroke-width="2"
       style="transition:transform .15s ease;transform-origin:${cx}px ${cy}px;cursor:pointer;"
       onmouseenter="tt(event,'${ps}',${count},${p})"
       onmouseleave="ht()" />`;
-  });
+        });
 
-  const legend = ['g1', 'g2', 'g3', 'g4'].map(gid => {
-    const count = grpCounts[gid];
-    const grp = GROUPS[gid];
-    const p = t > 0 ? (count / t * 100) : 0;
-    return `<div class="legend-item" style="cursor:pointer;" onclick="toggleGroupFilter('${gid}')">
+        const legend = ['g1', 'g2', 'g3', 'g4'].map(gid => {
+          const count = grpCounts[gid];
+          const grp = GROUPS[gid];
+          const p = t > 0 ? (count / t * 100) : 0;
+          return `<div class="legend-item" style="cursor:pointer;" onclick="toggleGroupFilter('${gid}')">
       <span class="legend-dot" style="background:${grp.badge}"></span>
       <span>${grp.icon} ${grp.short}: <strong>${pct(p)}</strong></span>
     </div>`;
-  }).join('');
+        }).join('');
 
-  con.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;">
+        con.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;">
     <svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}">
       ${paths.join('')}
-      <text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="22" font-weight="800" fill="#1f2937">${fmt(t)}</text>
-      <text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="11" fill="#9ca3af">khách hàng</text>
+      <text x="${cx}" y="${cy - 6}" text-anchor="middle" font-size="22" font-weight="800" fill="#1f2937">${fmt(t)}</text>
+      <text x="${cx}" y="${cy + 14}" text-anchor="middle" font-size="11" fill="#9ca3af">khách hàng</text>
     </svg>
     <div class="chart-legend">${legend}</div>
   </div>`;
-}
+      }
 
-// BAR CHART (Horizontal count comparison)
-function renderBarChart(f){
-  const con = $('bar-container');
-  if(!f.length){
-    con.innerHTML = '<div class="empty-state"><span class="empty-state-icon">📊</span><h3>Không có dữ liệu</h3></div>';
-    return;
-  }
+      // BAR CHART (Horizontal count comparison)
+      function renderBarChart(f) {
+        const con = $('bar-container');
+        if (!f.length) {
+          con.innerHTML = '<div class="empty-state"><span class="empty-state-icon">📊</span><h3>Không có dữ liệu</h3></div>';
+          return;
+        }
 
-  // Count top 12 statuses
-  const counts = {};
-  f.forEach(r => {
-    const s = r[S.colSts];
-    counts[s] = (counts[s] || 0) + 1;
-  });
+        // Count top 12 statuses
+        const counts = {};
+        f.forEach(r => {
+          const s = r[S.colSts];
+          counts[s] = (counts[s] || 0) + 1;
+        });
 
-  const ordered = Object.entries(counts).map(([s, n]) => ({ s, n, p: n / f.length * 100 })).sort((a, b) => b.n - a.n).slice(0, 12);
-  const mx = ordered[0].n;
-  const barH = 30, gap = 8, lw = 180;
-  const w = Math.max(500, con.offsetWidth || 700);
-  const bw = w - lw - 80;
-  const th = ordered.length * (barH + gap) + 10;
+        const ordered = Object.entries(counts).map(([s, n]) => ({ s, n, p: n / f.length * 100 })).sort((a, b) => b.n - a.n).slice(0, 12);
+        const mx = ordered[0].n;
+        const barH = 30, gap = 8, lw = 180;
+        const w = Math.max(500, con.offsetWidth || 700);
+        const bw = w - lw - 80;
+        const th = ordered.length * (barH + gap) + 10;
 
-  const bars = ordered.map(({ s, n, p }, i) => {
-    const c = gc(s);
-    const y = i * (barH + gap) + 5;
-    const blen = mx > 0 ? Math.max(4, (n / mx) * bw) : 0;
-    const sl = s.length > 22 ? s.substring(0, 22) + '…' : s;
-    const ps = esc(s).replace(/'/g, "\\'");
+        const bars = ordered.map(({ s, n, p }, i) => {
+          const c = gc(s);
+          const y = i * (barH + gap) + 5;
+          const blen = mx > 0 ? Math.max(4, (n / mx) * bw) : 0;
+          const sl = s.length > 22 ? s.substring(0, 22) + '…' : s;
+          const ps = esc(s).replace(/'/g, "\\'");
 
-    return `<g style="cursor:pointer;" onmouseenter="tt(event,'${ps}',${n},${p.toFixed(1)})" onmouseleave="ht()">
-      <text x="${lw - 8}" y="${y + barH/2 + 5}" text-anchor="end" font-size="12" fill="#4b5563">${esc(sl)}</text>
+          return `<g style="cursor:pointer;" onmouseenter="tt(event,'${ps}',${n},${p.toFixed(1)})" onmouseleave="ht()">
+      <text x="${lw - 8}" y="${y + barH / 2 + 5}" text-anchor="end" font-size="12" fill="#4b5563">${esc(sl)}</text>
       <rect x="${lw}" y="${y}" width="0" height="${barH}" rx="5" fill="${c}" opacity=".9">
         <animate attributeName="width" from="0" to="${blen}" dur=".4s" begin="${.03 * i}s" fill="freeze"/>
       </rect>
-      <text x="${lw + blen + 8}" y="${y + barH/2 + 5}" font-size="12" font-weight="700" fill="#1f2937">
+      <text x="${lw + blen + 8}" y="${y + barH / 2 + 5}" font-size="12" font-weight="700" fill="#1f2937">
         <animate attributeName="x" from="${lw + 8}" to="${lw + blen + 8}" dur=".4s" begin="${.03 * i}s" fill="freeze"/>
         ${fmt(n)}
       </text>
     </g>`;
-  }).join('');
+        }).join('');
 
-  con.innerHTML = `<svg width="100%" viewBox="0 0 ${w} ${th}" style="overflow:visible">${bars}</svg>`;
-}
-
-// TOOLTIP
-window.tt = function(e, s, n, p){
-  const t = $('tooltip');
-  t.innerHTML = `<strong>${s}</strong><br>Số lượng: ${fmt(n)}<br>Tỷ lệ: ${p}%`;
-  t.style.display = 'block';
-  t.style.left = (e.clientX + 14) + 'px';
-  t.style.top = (e.clientY - 10) + 'px';
-};
-window.ht = function(){ $('tooltip').style.display = 'none'; };
-
-window.toggleGroupFilter = function(gid){
-  S.fGroup = S.fGroup === gid ? '' : gid;
-  S.page = 1; update();
-};
-
-// DATA TABLE RENDER
-function renderDataTable(f){
-  const srt = getSortedRows(f);
-  const t = srt.length;
-  const start = (S.page - 1) * S.pageSize;
-  const end = Math.min(start + S.pageSize, t);
-  const pageRows = srt.slice(start, end);
-
-  $('data-count').textContent = t > 0 ? `Hiển thị ${fmt(start + 1)}–${fmt(end)} / ${fmt(t)} khách` : 'Không có dữ liệu';
-
-  // Visible columns
-  const vcols = S.cols.filter(Boolean).slice(0, 12);
-
-  // Table Header
-  $('dt-head').innerHTML = `<tr>${vcols.map(col => {
-    const isSorted = S.sortCol === col;
-    const cls = isSorted ? (S.sortDir === 'asc' ? 'sort-asc' : 'sort-desc') : '';
-    return `<th class="${cls}" data-col="${esc(col)}">${esc(col)}</th>`;
-  }).join('')}</tr>`;
-
-  $('dt-head').querySelectorAll('th').forEach(th => {
-    th.addEventListener('click', () => {
-      const col = th.dataset.col;
-      if(S.sortCol === col) S.sortDir = S.sortDir === 'asc' ? 'desc' : 'asc';
-      else { S.sortCol = col; S.sortDir = 'asc'; }
-      S.page = 1; update();
-    });
-  });
-
-  // Table Body
-  const tb = $('dt-body'), emp = $('dt-empty');
-  const q = S.fSearch.trim();
-
-  if(!pageRows.length){
-    tb.innerHTML = '';
-    emp.classList.remove('hidden');
-  } else {
-    emp.classList.add('hidden');
-    tb.innerHTML = pageRows.map(row => `<tr>${vcols.map(col => {
-      const val = row[col] ?? '';
-      let cell = esc(val);
-
-      if(col === S.colSts && val){
-        const grp = GROUPS[row._grp] || GROUPS.g4;
-        cell = `<span class="status-badge" style="background:${grp.bg};color:${grp.color};border:1px solid ${grp.border}">
-          ${grp.icon} ${esc(val)}
-        </span>`;
-      } else if(col === S.colDate && val){
-        cell = `<span style="font-weight:600;color:var(--primary-dark);">📅 ${esc(val)}</span>`;
-      } else if(col === S.colSrc && q){
-        cell = hl(val, q);
+        con.innerHTML = `<svg width="100%" viewBox="0 0 ${w} ${th}" style="overflow:visible">${bars}</svg>`;
       }
 
-      return `<td title="${esc(val)}">${cell}</td>`;
-    }).join('')}</tr>`).join('');
-  }
+      // TOOLTIP
+      window.tt = function (e, s, n, p) {
+        const t = $('tooltip');
+        t.innerHTML = `<strong>${s}</strong><br>Số lượng: ${fmt(n)}<br>Tỷ lệ: ${p}%`;
+        t.style.display = 'block';
+        t.style.left = (e.clientX + 14) + 'px';
+        t.style.top = (e.clientY - 10) + 'px';
+      };
+      window.ht = function () { $('tooltip').style.display = 'none'; };
 
-  renderPagination(t);
-}
+      window.toggleGroupFilter = function (gid) {
+        S.fGroup = S.fGroup === gid ? '' : gid;
+        S.page = 1; update();
+      };
 
-// PAGINATION CONTROLS
-function renderPagination(t){
-  const tp = Math.ceil(t / S.pageSize);
-  const pg = $('pagination');
-  if(tp <= 1){ pg.innerHTML = ''; return; }
+      // DATA TABLE RENDER
+      function renderDataTable(f) {
+        const srt = getSortedRows(f);
+        const t = srt.length;
+        const start = (S.page - 1) * S.pageSize;
+        const end = Math.min(start + S.pageSize, t);
+        const pageRows = srt.slice(start, end);
 
-  const cur = S.page;
-  const pages = [];
-  for(let i = 1; i <= tp; i++){
-    if(i === 1 || i === tp || (i >= cur - 2 && i <= cur + 2)) pages.push(i);
-    else if(pages[pages.length - 1] !== '...') pages.push('...');
-  }
+        $('data-count').textContent = t > 0 ? `Hiển thị ${fmt(start + 1)}–${fmt(end)} / ${fmt(t)} khách` : 'Không có dữ liệu';
 
-  pg.innerHTML = `
+        // Visible columns
+        const vcols = S.cols.filter(Boolean).slice(0, 12);
+
+        // Table Header
+        $('dt-head').innerHTML = `<tr>${vcols.map(col => {
+          const isSorted = S.sortCol === col;
+          const cls = isSorted ? (S.sortDir === 'asc' ? 'sort-asc' : 'sort-desc') : '';
+          return `<th class="${cls}" data-col="${esc(col)}">${esc(col)}</th>`;
+        }).join('')}</tr>`;
+
+        $('dt-head').querySelectorAll('th').forEach(th => {
+          th.addEventListener('click', () => {
+            const col = th.dataset.col;
+            if (S.sortCol === col) S.sortDir = S.sortDir === 'asc' ? 'desc' : 'asc';
+            else { S.sortCol = col; S.sortDir = 'asc'; }
+            S.page = 1; update();
+          });
+        });
+
+        // Table Body
+        const tb = $('dt-body'), emp = $('dt-empty');
+        const q = S.fSearch.trim();
+
+        if (!pageRows.length) {
+          tb.innerHTML = '';
+          emp.classList.remove('hidden');
+        } else {
+          emp.classList.add('hidden');
+          tb.innerHTML = pageRows.map(row => `<tr>${vcols.map(col => {
+            const val = row[col] ?? '';
+            let cell = esc(val);
+
+            if (col === S.colSts && val) {
+              const grp = GROUPS[row._grp] || GROUPS.g4;
+              cell = `<span class="status-badge" style="background:${grp.bg};color:${grp.color};border:1px solid ${grp.border}">
+          ${grp.icon} ${esc(val)}
+        </span>`;
+            } else if (col === S.colDate && val) {
+              cell = `<span style="font-weight:600;color:var(--primary-dark);">📅 ${esc(val)}</span>`;
+            } else if (col === S.colSrc && q) {
+              cell = hl(val, q);
+            }
+
+            return `<td title="${esc(val)}">${cell}</td>`;
+          }).join('')}</tr>`).join('');
+        }
+
+        renderPagination(t);
+      }
+
+      // PAGINATION CONTROLS
+      function renderPagination(t) {
+        const tp = Math.ceil(t / S.pageSize);
+        const pg = $('pagination');
+        if (tp <= 1) { pg.innerHTML = ''; return; }
+
+        const cur = S.page;
+        const pages = [];
+        for (let i = 1; i <= tp; i++) {
+          if (i === 1 || i === tp || (i >= cur - 2 && i <= cur + 2)) pages.push(i);
+          else if (pages[pages.length - 1] !== '...') pages.push('...');
+        }
+
+        pg.innerHTML = `
     <span class="pagination-info">Trang ${cur} / ${tp}</span>
     <div class="pagination-controls">
       <button class="page-btn" id="pp" ${cur === 1 ? 'disabled' : ''}>‹</button>
@@ -1601,144 +3657,183 @@ function renderPagination(t){
       <button class="page-btn" id="pn" ${cur === tp ? 'disabled' : ''}>›</button>
     </div>`;
 
-  pg.querySelectorAll('[data-p]').forEach(b => b.addEventListener('click', () => { S.page = +b.dataset.p; update(); }));
-  const pp = $('pp'), pn = $('pn');
-  if(pp) pp.addEventListener('click', () => { S.page--; update(); });
-  if(pn) pn.addEventListener('click', () => { S.page++; update(); });
-}
+        pg.querySelectorAll('[data-p]').forEach(b => b.addEventListener('click', () => { S.page = +b.dataset.p; update(); }));
+        const pp = $('pp'), pn = $('pn');
+        if (pp) pp.addEventListener('click', () => { S.page--; update(); });
+        if (pn) pn.addEventListener('click', () => { S.page++; update(); });
+      }
 
-// EVENT LISTENERS: 4 GROUP CARDS
-['g1', 'g2', 'g3', 'g4'].forEach(gid => {
-  $(`card-grp-${gid}`).addEventListener('click', () => {
-    S.fGroup = S.fGroup === gid ? '' : gid;
-    S.page = 1; update();
-  });
-});
-$('group-clear-btn').addEventListener('click', () => {
-  S.fGroup = '';
-  S.page = 1; update();
-});
+      // EVENT LISTENERS: 4 GROUP CARDS
+      ['g1', 'g2', 'g3', 'g4'].forEach(gid => {
+        $(`card-grp-${gid}`).addEventListener('click', () => {
+          S.fGroup = S.fGroup === gid ? '' : gid;
+          S.page = 1; update();
+        });
+      });
+      $('group-clear-btn').addEventListener('click', () => {
+        S.fGroup = '';
+        S.page = 1; update();
+      });
 
-// EVENT LISTENERS: VIEW TOGGLE (4 Groups vs Details)
-$('btn-view-groups').addEventListener('click', () => {
-  S.statusViewMode = 'groups';
-  $('btn-view-groups').classList.add('active');
-  $('btn-view-details').classList.remove('active');
-  update();
-});
-$('btn-view-details').addEventListener('click', () => {
-  S.statusViewMode = 'details';
-  $('btn-view-details').classList.add('active');
-  $('btn-view-groups').classList.remove('active');
-  update();
-});
+      // EVENT LISTENERS: VIEW TOGGLE (4 Groups vs Details)
+      $('btn-view-groups').addEventListener('click', () => {
+        S.statusViewMode = 'groups';
+        $('btn-view-groups').classList.add('active');
+        $('btn-view-details').classList.remove('active');
+        update();
+      });
+      $('btn-view-details').addEventListener('click', () => {
+        S.statusViewMode = 'details';
+        $('btn-view-details').classList.add('active');
+        $('btn-view-groups').classList.remove('active');
+        update();
+      });
 
-// EVENT LISTENERS: FILTERS
-let dbt;
-$('filter-search').addEventListener('input', e => {
-  clearTimeout(dbt);
-  dbt = setTimeout(() => {
-    S.fSearch = e.target.value;
-    S.fSrc = ''; $('filter-source').value = '';
-    S.page = 1; update();
-  }, 250);
-});
+      // MODAL CONTROLLERS & EVENT LISTENERS
+      function openFilterModal() {
+        tempFilters.dates = new Set(S.fDates);
+        tempFilters.srcs = new Set(S.fSrcs);
+        tempFilters.svcs = new Set(S.fSvcs);
+        tempFilters.stss = new Set(S.fStss);
+        tempFilters.schs = new Set(S.fSchs);
 
-$('filter-source').addEventListener('change', e => {
-  S.fSrc = e.target.value;
-  S.fSearch = ''; $('filter-search').value = '';
-  S.page = 1; update();
-});
+        // Sync widgets to current tempFilters
+        syncFlatWidget('dates', 'ms-text-date', 'ms-list-date', filterOptions.dates, 'Tất cả các ngày', 'ngày');
+        syncFlatWidget('srcs', 'ms-text-source', 'ms-list-source', filterOptions.srcs, 'Tất cả nhân viên', 'nhân viên');
+        if (S.colSvc) syncFlatWidget('svcs', 'ms-text-service', 'ms-list-service', filterOptions.svcs, 'Tất cả dịch vụ', 'dịch vụ');
+        if (S.colSch) syncFlatWidget('schs', 'ms-text-schedule', 'ms-list-schedule', filterOptions.schs, 'Tất cả', 'lịch hẹn');
+        syncStatusWidget();
 
-$('filter-service').addEventListener('change', e => {
-  S.fSvc = e.target.value;
-  S.page = 1; update();
-});
+        closeAllDropdowns();
+        const backdrop = $('filter-modal-backdrop');
+        backdrop.classList.remove('hidden');
+        requestAnimationFrame(() => backdrop.classList.add('open'));
+      }
 
-$('filter-date').addEventListener('change', e => {
-  S.fDate = e.target.value;
-  S.page = 1; update();
-});
+      function closeFilterModal() {
+        const backdrop = $('filter-modal-backdrop');
+        backdrop.classList.remove('open');
+        closeAllDropdowns();
+        setTimeout(() => backdrop.classList.add('hidden'), 200);
+      }
 
-$('filter-status').addEventListener('change', e => {
-  S.fSts = e.target.value;
-  S.page = 1; update();
-});
+      function applyFilterModal() {
+        S.fDates = Array.from(tempFilters.dates);
+        S.fSrcs = Array.from(tempFilters.srcs);
+        S.fSvcs = Array.from(tempFilters.svcs);
+        S.fStss = Array.from(tempFilters.stss);
+        S.fSchs = Array.from(tempFilters.schs);
+        closeFilterModal();
+        S.page = 1;
+        update();
+      }
 
-$('filter-schedule').addEventListener('change', e => {
-  S.fSch = e.target.value;
-  S.page = 1; update();
-});
+      function resetAllFilters() {
+        tempFilters.dates.clear();
+        tempFilters.srcs.clear();
+        tempFilters.svcs.clear();
+        tempFilters.stss.clear();
+        tempFilters.schs.clear();
+        S.fDates = [];
+        S.fSrcs = [];
+        S.fSvcs = [];
+        S.fStss = [];
+        S.fSchs = [];
+        S.fGroup = '';
+        S.fSearch = '';
+        closeFilterModal();
+        S.page = 1;
+        update();
+      }
 
-$('btn-reset-filters').addEventListener('click', () => {
-  S.fDate = ''; S.fSearch = ''; S.fSrc = ''; S.fSvc = ''; S.fSts = ''; S.fGroup = ''; S.fSch = '';
-  S.page = 1;
-  $('filter-date').value = '';
-  $('filter-search').value = '';
-  $('filter-source').value = '';
-  $('filter-service').value = '';
-  $('filter-status').value = '';
-  if($('filter-schedule')) $('filter-schedule').value = '';
-  update();
-});
+      $('btn-open-filter-modal').addEventListener('click', openFilterModal);
+      $('btn-close-filter-modal').addEventListener('click', closeFilterModal);
+      $('btn-modal-cancel').addEventListener('click', closeFilterModal);
+      $('btn-modal-apply').addEventListener('click', applyFilterModal);
+      $('btn-modal-reset').addEventListener('click', resetAllFilters);
 
-$('page-size').addEventListener('change', e => {
-  S.pageSize = +e.target.value;
-  S.page = 1; update();
-});
+      const quickReset = $('btn-quick-reset');
+      if (quickReset) {
+        quickReset.addEventListener('click', resetAllFilters);
+      }
 
-// EXPORT REPORT
-$('btn-export').addEventListener('click', () => {
-  const f = getFilteredRows();
-  const counts = { g1: 0, g2: 0, g3: 0, g4: 0 };
-  f.forEach(r => { counts[r._grp]++; });
+      $('filter-modal-backdrop').addEventListener('click', (e) => {
+        if (e.target === $('filter-modal-backdrop')) {
+          closeFilterModal();
+        }
+      });
 
-  const rows = [
-    ['BÁO CÁO PHÂN TÍCH TELESALE'],
-    ['Ngày xuất báo cáo', new Date().toLocaleString('vi-VN')],
-    ['Ngày lọc dữ liệu', S.fDate ? S.fDate : 'Tất cả các ngày'],
-    ['Nhân viên', S.fSrc || S.fSearch || 'Tất cả'],
-    ['Tổng số lead', f.length],
-    [],
-    ['--- THỐNG KÊ 4 NHÓM TRẠNG THÁI ---'],
-    ['Mã nhóm', 'Tên nhóm', 'Số lượng', 'Tỷ lệ (%)'],
-    ...['g1', 'g2', 'g3', 'g4'].map(gid => [
-      gid.toUpperCase(),
-      GROUPS[gid].name,
-      counts[gid],
-      (f.length > 0 ? (counts[gid] / f.length * 100).toFixed(2) : '0.00') + '%'
-    ]),
-    [],
-    ['--- CHI TIẾT THEO TỪNG TRẠNG THÁI ---'],
-    ['Trạng thái', 'Nhóm phân loại', 'Số lượng', 'Tỷ lệ (%)']
-  ];
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !$('filter-modal-backdrop').classList.contains('hidden')) {
+          closeFilterModal();
+        }
+      });
 
-  const stsCounts = {};
-  f.forEach(r => {
-    const s = r[S.colSts];
-    if(!stsCounts[s]) stsCounts[s] = { count: 0, grp: r._grp };
-    stsCounts[s].count++;
-  });
+      $('page-size').addEventListener('change', e => {
+        S.pageSize = +e.target.value;
+        S.page = 1; update();
+      });
 
-  Object.entries(stsCounts).sort((a, b) => b[1].count - a[1].count).forEach(([s, item]) => {
-    rows.push([
-      s,
-      GROUPS[item.grp].name,
-      item.count,
-      (f.length > 0 ? (item.count / f.length * 100).toFixed(2) : '0.00') + '%'
-    ]);
-  });
+      // EXPORT REPORT
+      $('btn-export').addEventListener('click', () => {
+        const f = getFilteredRows();
+        const counts = { g1: 0, g2: 0, g3: 0, g4: 0 };
+        f.forEach(r => { counts[r._grp]++; });
 
-  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\r\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url;
-  const dTag = S.fDate ? `ngay-${S.fDate.replace('/', '-')}` : 'all-dates';
-  a.download = `bao-cao-telesale-${dTag}-${new Date().toISOString().slice(0, 10)}.csv`;
-  a.click(); URL.revokeObjectURL(url);
-});
+        const dateLabel = S.fDates.length > 0 ? S.fDates.join(', ') : 'Tất cả các ngày';
+        const srcLabel = S.fSrcs.length > 0 ? S.fSrcs.join(', ') : (S.fSearch || 'Tất cả');
+        const svcLabel = S.fSvcs.length > 0 ? S.fSvcs.join(', ') : 'Tất cả';
+        const stsLabel = S.fStss.length > 0 ? S.fStss.join(', ') : (S.fGroup ? GROUPS[S.fGroup].name : 'Tất cả');
 
-})();
-</script>
+        const rows = [
+          ['BÁO CÁO PHÂN TÍCH TELESALE'],
+          ['Ngày xuất báo cáo', new Date().toLocaleString('vi-VN')],
+          ['Ngày lọc dữ liệu', dateLabel],
+          ['Nhân viên lọc', srcLabel],
+          ['Dịch vụ lọc', svcLabel],
+          ['Trạng thái lọc', stsLabel],
+          ['Tổng số lead', f.length],
+          [],
+          ['--- THỐNG KÊ 4 NHÓM TRẠNG THÁI ---'],
+          ['Mã nhóm', 'Tên nhóm', 'Số lượng', 'Tỷ lệ (%)'],
+          ...['g1', 'g2', 'g3', 'g4'].map(gid => [
+            gid.toUpperCase(),
+            GROUPS[gid].name,
+            counts[gid],
+            (f.length > 0 ? (counts[gid] / f.length * 100).toFixed(2) : '0.00') + '%'
+          ]),
+          [],
+          ['--- CHI TIẾT THEO TỪNG TRẠNG THÁI ---'],
+          ['Trạng thái', 'Nhóm phân loại', 'Số lượng', 'Tỷ lệ (%)']
+        ];
+
+        const stsCounts = {};
+        f.forEach(r => {
+          const s = r[S.colSts];
+          if (!stsCounts[s]) stsCounts[s] = { count: 0, grp: r._grp };
+          stsCounts[s].count++;
+        });
+
+        Object.entries(stsCounts).sort((a, b) => b[1].count - a[1].count).forEach(([s, item]) => {
+          rows.push([
+            s,
+            GROUPS[item.grp].name,
+            item.count,
+            (f.length > 0 ? (item.count / f.length * 100).toFixed(2) : '0.00') + '%'
+          ]);
+        });
+
+        const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url;
+        const dTag = S.fDates.length > 0 ? `ngay-${S.fDates.join('-').replace(/\//g, '-')}` : 'all-dates';
+        a.download = `bao-cao-telesale-${dTag}-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click(); URL.revokeObjectURL(url);
+      });
+
+    })();
+  </script>
 </body>
+
 </html>

@@ -184,22 +184,93 @@ HTML_CONTENT = r'''<!DOCTYPE html>
     .grp-g4 .group-card-pct { color:var(--g4-color); }
     .grp-g4 .group-check { background:var(--g4-badge); }
     
-    /* FILTERS CARD */
-    .filters-card { background:var(--white); border-radius:var(--radius-lg); padding:18px 22px; margin-top:20px; box-shadow:var(--shadow-sm); border:1px solid var(--gray-100); }
-    .filters-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-    .filters-title { font-size:14px; font-weight:700; color:var(--gray-800); display:flex; align-items:center; gap:8px; }
-    .filters-row { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
-    .filter-group { display:flex; flex-direction:column; gap:5px; min-width:140px; }
-    .filter-group label { font-size:12px; font-weight:600; color:var(--gray-600); }
-    .filter-input, .filter-select { padding:8px 12px; border:1px solid var(--gray-300); border-radius:var(--radius-sm); font-size:13px; color:var(--gray-800); background:var(--white); transition:var(--transition); font-family:inherit; }
-    .filter-select { appearance:none; padding-right:32px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; cursor:pointer; }
-    .filter-input:focus, .filter-select:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(99,102,241,.12); }
-    
-    .active-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px; padding-top:12px; border-top:1px solid var(--gray-100); }
+    /* FILTERS BAR CARD */
+    .filters-card { background:var(--white); border-radius:var(--radius-lg); padding:16px 20px; margin-top:20px; box-shadow:var(--shadow-sm); border:1px solid var(--gray-100); }
+    .filters-bar-main { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+    .filters-bar-left { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .btn-filter-trigger { display:inline-flex; align-items:center; gap:8px; padding:9px 18px; border-radius:var(--radius); background:var(--white); border:1.5px solid var(--primary); color:var(--primary-dark); font-size:14px; font-weight:700; cursor:pointer; transition:var(--transition); box-shadow:0 1px 3px rgba(99,102,241,.12); font-family:inherit; }
+    .btn-filter-trigger:hover { background:var(--primary-bg); border-color:var(--primary-dark); transform:translateY(-1px); box-shadow:0 4px 8px rgba(99,102,241,.18); }
+    .btn-filter-trigger:active { transform:translateY(0); }
+    .btn-filter-trigger.has-active { background:var(--primary); color:white; border-color:var(--primary); box-shadow:0 2px 8px rgba(99,102,241,.3); }
+    .btn-filter-trigger.has-active:hover { background:var(--primary-dark); }
+    .filter-trigger-badge { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; padding:0 6px; border-radius:10px; font-size:11px; font-weight:800; background:white; color:var(--primary-dark); box-shadow:0 1px 2px rgba(0,0,0,.15); }
+    .btn-filter-trigger:not(.has-active) .filter-trigger-badge { background:var(--primary-bg); color:var(--primary-dark); }
+    .filter-summary-text { font-size:13px; color:var(--gray-500); font-weight:500; }
+    .filter-summary-text strong { color:var(--gray-800); font-weight:600; }
+
+    .active-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:14px; padding-top:12px; border-top:1px solid var(--gray-100); }
     .active-filters-label { font-size:12px; color:var(--gray-400); font-weight:600; }
-    .filter-badge { display:inline-flex; align-items:center; gap:6px; background:var(--primary-bg); color:var(--primary-dark); font-size:12px; font-weight:500; padding:3px 10px; border-radius:14px; border:1px solid #c7d2fe; cursor:pointer; }
-    .filter-badge:hover { background:#dbeafe; }
-    .filter-badge span { font-weight:700; font-size:13px; margin-left:2px; }
+    .filter-badge { display:inline-flex; align-items:center; gap:6px; background:var(--primary-bg); color:var(--primary-dark); font-size:12px; font-weight:500; padding:4px 10px; border-radius:14px; border:1px solid #c7d2fe; cursor:pointer; transition:var(--transition); }
+    .filter-badge:hover { background:#dbeafe; border-color:#93c5fd; }
+    .filter-badge span { font-weight:700; font-size:14px; margin-left:3px; opacity:.7; }
+    .filter-badge:hover span { opacity:1; }
+
+    /* POPUP MODAL STYLES */
+    .modal-backdrop { position:fixed; inset:0; z-index:1000; background:rgba(15,23,42,.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:16px; opacity:0; pointer-events:none; transition:opacity .2s ease; }
+    .modal-backdrop.open { opacity:1; pointer-events:auto; }
+    
+    .modal-dialog { background:var(--white); border-radius:var(--radius-xl); box-shadow:0 25px 50px -12px rgba(0,0,0,.25); width:100%; max-width:720px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; transform:scale(.96) translateY(10px); transition:transform .2s ease; border:1px solid var(--gray-100); }
+    .modal-backdrop.open .modal-dialog { transform:scale(1) translateY(0); }
+
+    .modal-header { padding:18px 24px; border-bottom:1px solid var(--gray-100); display:flex; align-items:center; justify-content:space-between; background:var(--white); position:relative; }
+    .modal-title-wrap { display:flex; flex-direction:column; gap:2px; }
+    .modal-title { font-size:17px; font-weight:800; color:var(--gray-900); display:flex; align-items:center; gap:8px; }
+    .modal-subtitle { font-size:12px; color:var(--gray-400); }
+    .modal-close-btn { width:32px; height:32px; border-radius:8px; border:none; background:var(--gray-100); color:var(--gray-500); font-size:20px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:var(--transition); line-height:1; }
+    .modal-close-btn:hover { background:var(--gray-200); color:var(--gray-800); }
+
+    .modal-body { padding:22px 24px 30px 24px; overflow-y:auto; flex:1; }
+    .modal-filters-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:18px; }
+    .ms-form-group-full { grid-column:span 2; }
+    @media(max-width:640px) {
+      .modal-filters-grid { grid-template-columns:1fr; }
+      .ms-form-group-full { grid-column:span 1; }
+      .modal-dialog { max-height:96vh; }
+      .modal-body { padding:16px 16px 24px 16px; }
+    }
+
+    .ms-form-group { display:flex; flex-direction:column; gap:6px; position:relative; }
+    .ms-label { font-size:12px; font-weight:700; color:var(--gray-700); display:flex; align-items:center; gap:6px; }
+    
+    /* MULTI-SELECT DROPDOWN COMPONENT */
+    .ms-widget { position:relative; width:100%; }
+    .ms-trigger { width:100%; display:flex; align-items:center; justify-content:space-between; padding:9px 12px; border:1px solid var(--gray-300); border-radius:var(--radius-sm); background:var(--white); font-size:13px; color:var(--gray-800); cursor:pointer; transition:var(--transition); user-select:none; font-family:inherit; text-align:left; min-height:40px; }
+    .ms-trigger:hover { border-color:var(--primary-light); background:var(--gray-50); }
+    .ms-widget.open .ms-trigger { border-color:var(--primary); box-shadow:0 0 0 3px rgba(99,102,241,.15); }
+    .ms-trigger-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; padding-right:8px; font-weight:500; }
+    .ms-trigger-text.is-all { color:var(--gray-600); }
+    .ms-trigger-text.is-selected { color:var(--primary-dark); font-weight:600; }
+    .ms-trigger-arrow { font-size:11px; color:var(--gray-400); transition:transform .2s ease; flex-shrink:0; }
+    .ms-widget.open .ms-trigger-arrow { transform:rotate(180deg); color:var(--primary); }
+
+    .ms-dropdown { position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--white); border:1px solid var(--gray-200); border-radius:var(--radius); box-shadow:var(--shadow-lg); z-index:100; padding:8px 0 6px 0; display:none; }
+    .ms-widget.open .ms-dropdown { display:block; animation:fadeInDown .15s ease; }
+    @keyframes fadeInDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+    .ms-search-box { padding:0 10px 8px 10px; border-bottom:1px solid var(--gray-100); }
+    .ms-search-input { width:100%; padding:7px 10px; border:1px solid var(--gray-200); border-radius:6px; font-size:12px; color:var(--gray-800); background:var(--gray-50); outline:none; transition:var(--transition); font-family:inherit; }
+    .ms-search-input:focus { background:white; border-color:var(--primary); box-shadow:0 0 0 2px rgba(99,102,241,.1); }
+
+    .ms-options-list { max-height:210px; overflow-y:auto; padding:6px 6px 2px 6px; }
+    .ms-options-list::-webkit-scrollbar { width:6px; }
+    .ms-options-list::-webkit-scrollbar-thumb { background:var(--gray-300); border-radius:3px; }
+    
+    .ms-option-item { display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:6px; cursor:pointer; font-size:13px; color:var(--gray-700); user-select:none; transition:background .15s; }
+    .ms-option-item:hover { background:var(--gray-50); color:var(--gray-900); }
+    .ms-option-item.is-special { font-weight:700; color:var(--primary-dark); border-bottom:1px solid var(--gray-100); margin-bottom:4px; border-radius:6px 6px 0 0; }
+    .ms-option-item.selected { background:var(--primary-bg); color:var(--primary-dark); font-weight:600; }
+    .ms-option-item input[type="checkbox"] { width:16px; height:16px; accent-color:var(--primary); cursor:pointer; flex-shrink:0; margin:0; }
+    .ms-option-text { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    /* Group styling in Status dropdown */
+    .ms-group-header { padding:8px 10px 4px 10px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; display:flex; align-items:center; justify-content:space-between; color:var(--gray-500); background:var(--gray-50); border-radius:6px; margin:6px 0 2px 0; }
+    .ms-group-check-wrap { display:flex; align-items:center; gap:6px; cursor:pointer; }
+    .ms-group-check-wrap input[type="checkbox"] { width:15px; height:15px; accent-color:var(--primary); cursor:pointer; margin:0; }
+    .ms-child-item { padding-left:24px !important; }
+    .ms-no-results { text-align:center; padding:16px; font-size:12px; color:var(--gray-400); }
+
+    .modal-footer { padding:14px 24px; border-top:1px solid var(--gray-200); background:var(--gray-50); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+    .modal-footer-right { display:flex; align-items:center; gap:10px; }
     
     /* PANELS */
     .panel { background:var(--white); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); border:1px solid var(--gray-100); overflow:hidden; }
@@ -448,42 +519,19 @@ HTML_CONTENT = r'''<!DOCTYPE html>
       </div>
     </div>
 
-    <!-- MAIN FILTERS -->
+    <!-- MAIN FILTERS BAR -->
     <div class="filters-card">
-      <div class="filters-header">
-        <div class="filters-title">🔍 Bộ lọc chi tiết</div>
-        <button class="btn btn-secondary btn-sm" id="btn-reset-filters">↺ Reset bộ lọc</button>
-      </div>
-      <div class="filters-row">
-        <!-- Ngày Filter -->
-        <div class="filter-group" style="flex:1.1;min-width:180px;">
-          <label>📅 Lọc theo Ngày (VD: 1/9, 4/9...)</label>
-          <select id="filter-date" class="filter-select"><option value="">Tất cả các ngày</option></select>
+      <div class="filters-bar-main">
+        <div class="filters-bar-left">
+          <button class="btn-filter-trigger" id="btn-open-filter-modal" type="button">
+            <span>🔎</span>
+            <span>Bộ lọc chi tiết</span>
+            <span class="filter-trigger-badge hidden" id="filter-active-count">0</span>
+          </button>
+          <div class="filter-summary-text" id="filter-summary-text"></div>
         </div>
-        <!-- Nhân viên Search -->
-        <div class="filter-group" style="flex:1.2;min-width:190px;">
-          <label>🔎 Tìm kiếm nhân viên</label>
-          <input type="text" id="filter-search" class="filter-input" placeholder="Nhập tên (Lợi, Cường, Vy...)" autocomplete="off" />
-        </div>
-        <!-- Nhân viên Select -->
-        <div class="filter-group" style="flex:1.1;min-width:170px;">
-          <label>👤 Nhân viên cụ thể</label>
-          <select id="filter-source" class="filter-select"><option value="">Tất cả nhân viên</option></select>
-        </div>
-        <!-- Dịch vụ Select -->
-        <div class="filter-group" id="filter-service-wrap" style="display:none;flex:1.1;min-width:170px;">
-          <label>🛎️ Dịch vụ</label>
-          <select id="filter-service" class="filter-select"><option value="">Tất cả dịch vụ</option></select>
-        </div>
-        <!-- Trạng thái Grouped Select -->
-        <div class="filter-group" style="flex:1.5;min-width:220px;">
-          <label>📋 Trạng thái (Gom 4 nhóm)</label>
-          <select id="filter-status" class="filter-select"><option value="">Tất cả trạng thái</option></select>
-        </div>
-        <!-- Đặt lịch Select -->
-        <div class="filter-group" id="filter-schedule-wrap" style="display:none;min-width:140px;">
-          <label>⏰ Lịch hẹn</label>
-          <select id="filter-schedule" class="filter-select"><option value="">Tất cả</option></select>
+        <div class="filters-bar-right">
+          <button class="btn btn-secondary btn-sm hidden" id="btn-quick-reset" type="button">↺ Đặt lại bộ lọc</button>
         </div>
       </div>
       <div class="active-filters hidden" id="active-filters"></div>
@@ -590,6 +638,116 @@ HTML_CONTENT = r'''<!DOCTYPE html>
       <div class="pagination" id="pagination"></div>
     </div>
 
+  </div>
+</div>
+
+<!-- FILTER MODAL POPUP -->
+<div class="modal-backdrop hidden" id="filter-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-filter-title">
+  <div class="modal-dialog" id="filter-modal-dialog">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <div class="modal-title" id="modal-filter-title">🔎 Bộ lọc chi tiết</div>
+        <div class="modal-subtitle">Hỗ trợ chọn nhiều giá trị – Bấm 'Áp dụng bộ lọc' để cập nhật dữ liệu</div>
+      </div>
+      <button class="modal-close-btn" id="btn-close-filter-modal" type="button" title="Đóng">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="modal-filters-grid">
+        <!-- Ngày Filter -->
+        <div class="ms-form-group" id="group-filter-date">
+          <label class="ms-label">📅 Lọc theo Ngày</label>
+          <div class="ms-widget" id="ms-widget-date">
+            <button type="button" class="ms-trigger" id="ms-trigger-date">
+              <span class="ms-trigger-text is-all" id="ms-text-date">Tất cả các ngày</span>
+              <span class="ms-trigger-arrow">▼</span>
+            </button>
+            <div class="ms-dropdown" id="ms-dropdown-date">
+              <div class="ms-search-box">
+                <input type="text" class="ms-search-input" id="ms-search-date" placeholder="🔍 Tìm ngày..." autocomplete="off" />
+              </div>
+              <div class="ms-options-list" id="ms-list-date"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nhân viên Filter -->
+        <div class="ms-form-group" id="group-filter-source">
+          <label class="ms-label">👤 Nhân viên cụ thể</label>
+          <div class="ms-widget" id="ms-widget-source">
+            <button type="button" class="ms-trigger" id="ms-trigger-source">
+              <span class="ms-trigger-text is-all" id="ms-text-source">Tất cả nhân viên</span>
+              <span class="ms-trigger-arrow">▼</span>
+            </button>
+            <div class="ms-dropdown" id="ms-dropdown-source">
+              <div class="ms-search-box">
+                <input type="text" class="ms-search-input" id="ms-search-source" placeholder="🔍 Tìm nhân viên..." autocomplete="off" />
+              </div>
+              <div class="ms-options-list" id="ms-list-source"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dịch vụ Filter -->
+        <div class="ms-form-group" id="group-filter-service" style="display:none;">
+          <label class="ms-label">🛎️ Dịch vụ</label>
+          <div class="ms-widget" id="ms-widget-service">
+            <button type="button" class="ms-trigger" id="ms-trigger-service">
+              <span class="ms-trigger-text is-all" id="ms-text-service">Tất cả dịch vụ</span>
+              <span class="ms-trigger-arrow">▼</span>
+            </button>
+            <div class="ms-dropdown" id="ms-dropdown-service">
+              <div class="ms-search-box">
+                <input type="text" class="ms-search-input" id="ms-search-service" placeholder="🔍 Tìm dịch vụ..." autocomplete="off" />
+              </div>
+              <div class="ms-options-list" id="ms-list-service"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lịch hẹn Filter -->
+        <div class="ms-form-group" id="group-filter-schedule" style="display:none;">
+          <label class="ms-label">⏰ Lịch hẹn</label>
+          <div class="ms-widget" id="ms-widget-schedule">
+            <button type="button" class="ms-trigger" id="ms-trigger-schedule">
+              <span class="ms-trigger-text is-all" id="ms-text-schedule">Tất cả</span>
+              <span class="ms-trigger-arrow">▼</span>
+            </button>
+            <div class="ms-dropdown" id="ms-dropdown-schedule">
+              <div class="ms-search-box">
+                <input type="text" class="ms-search-input" id="ms-search-schedule" placeholder="🔍 Tìm lịch hẹn..." autocomplete="off" />
+              </div>
+              <div class="ms-options-list" id="ms-list-schedule"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trạng thái Grouped Select (Chiếm full 2 cột) -->
+        <div class="ms-form-group ms-form-group-full" id="group-filter-status">
+          <label class="ms-label">📋 Trạng thái (Gom 4 nhóm)</label>
+          <div class="ms-widget" id="ms-widget-status">
+            <button type="button" class="ms-trigger" id="ms-trigger-status">
+              <span class="ms-trigger-text is-all" id="ms-text-status">Tất cả trạng thái (Tất cả nhóm)</span>
+              <span class="ms-trigger-arrow">▼</span>
+            </button>
+            <div class="ms-dropdown" id="ms-dropdown-status">
+              <div class="ms-search-box">
+                <input type="text" class="ms-search-input" id="ms-search-status" placeholder="🔍 Tìm trạng thái..." autocomplete="off" />
+              </div>
+              <div class="ms-options-list" id="ms-list-status"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btn-modal-reset" type="button">↺ Đặt lại bộ lọc</button>
+      <div class="modal-footer-right">
+        <button class="btn btn-secondary" id="btn-modal-cancel" type="button">Hủy</button>
+        <button class="btn btn-primary" id="btn-modal-apply" type="button">Áp dụng bộ lọc</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -725,14 +883,14 @@ const S = {
   colSch: null,
   colName: null,
   
-  // Filters
-  fDate: '',
+  // Filters (Multi-select)
+  fDates: [],
   fSearch: '',
-  fSrc: '',
-  fSvc: '',
-  fSts: '',
+  fSrcs: [],
+  fSvcs: [],
+  fStss: [],
   fGroup: '',
-  fSch: '',
+  fSchs: [],
   
   // View Settings
   statusViewMode: 'groups', // 'groups' or 'details'
@@ -974,7 +1132,7 @@ function processData(){
     populateFilters();
 
     // Reset filters
-    S.fDate = ''; S.fSearch = ''; S.fSrc = ''; S.fSts = ''; S.fGroup = ''; S.fSch = '';
+    S.fDates = []; S.fSearch = ''; S.fSrcs = []; S.fSvcs = []; S.fStss = []; S.fGroup = ''; S.fSchs = [];
     S.sortCol = null; S.sortDir = 'asc'; S.page = 1; S.pageSize = 20;
     $('page-size').value = '20';
 
@@ -983,13 +1141,33 @@ function processData(){
     $('btn-export').classList.remove('hidden');
     $('card-total-all').textContent = fmt(S.all.length);
     $('card-g1-total-all').textContent = fmt(S.all.length);
-    $('filter-schedule-wrap').style.display = S.colSch ? '' : 'none';
+    $('group-filter-schedule').style.display = S.colSch ? '' : 'none';
+    $('group-filter-service').style.display = S.colSvc ? '' : 'none';
 
     show('dash');
     hideLoad();
     update();
   }, 60);
 }
+
+// FILTER OPTIONS STORE & TEMP STATE FOR MODAL
+const filterOptions = {
+  dates: [],
+  srcs: [],
+  svcs: [],
+  groupedSts: { g1: [], g2: [], g3: [], g4: [] },
+  schs: []
+};
+
+const tempFilters = {
+  dates: new Set(),
+  srcs: new Set(),
+  svcs: new Set(),
+  stss: new Set(),
+  schs: new Set()
+};
+
+let dropdownListenersInitialized = false;
 
 // POPULATE ALL FILTER DROPDOWNS
 function populateFilters(){
@@ -1005,122 +1183,389 @@ function populateFilters(){
     return a.localeCompare(b, 'vi');
   }
 
-  // 1. Date Filter
+  // 1. Dates
   if(S.colDate){
     const dateCounts = {};
     S.all.forEach(r => { const d = r[S.colDate]; dateCounts[d] = (dateCounts[d] || 0) + 1; });
     const dates = Object.keys(dateCounts).sort(sortDates);
-    const fd = $('filter-date');
-    fd.innerHTML = '<option value="">Tất cả các ngày</option>';
-    dates.forEach(d => {
-      const opt = document.createElement('option');
-      opt.value = d;
-      opt.textContent = `Ngày ${d} (${fmt(dateCounts[d])} lead)`;
-      fd.appendChild(opt);
-    });
+    filterOptions.dates = dates.map(d => ({
+      val: d,
+      label: `Ngày ${d} (${fmt(dateCounts[d])} lead)`
+    }));
+  } else {
+    filterOptions.dates = [];
   }
 
-  // 2. Sources Filter
+  // 2. Sources (Employees)
   const srcs = [...new Set(S.all.map(r => r[S.colSrc]))].sort();
-  const fs = $('filter-source');
-  fs.innerHTML = '<option value="">Tất cả nhân viên</option>';
-  srcs.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; fs.appendChild(o); });
+  filterOptions.srcs = srcs.map(s => ({ val: s, label: s }));
 
-  // 3. Services Filter
+  // 3. Services
   if(S.colSvc){
     const svcs = [...new Set(S.all.map(r => r[S.colSvc] ?? '').filter(Boolean))].sort();
-    const fsvc = $('filter-service');
-    fsvc.innerHTML = '<option value="">Tất cả dịch vụ</option>';
-    svcs.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; fsvc.appendChild(o); });
-    $('filter-service-wrap').style.display = '';
+    filterOptions.svcs = svcs.map(s => ({ val: s, label: s }));
+    $('group-filter-service').style.display = '';
   } else {
-    $('filter-service-wrap').style.display = 'none';
+    filterOptions.svcs = [];
+    $('group-filter-service').style.display = 'none';
   }
 
-  // 4. Statuses Filter (Gom nhóm optgroup rõ ràng)
-  const fst = $('filter-status');
-  fst.innerHTML = '<option value="">Tất cả trạng thái (Tất cả nhóm)</option>';
-
-  // Group status items by their assigned group
+  // 4. Statuses (Grouped 4 Groups)
   const groupedStatuses = { g1: new Set(), g2: new Set(), g3: new Set(), g4: new Set() };
   S.all.forEach(r => {
     if(groupedStatuses[r._grp]) groupedStatuses[r._grp].add(r[S.colSts]);
   });
-
   ['g1', 'g2', 'g3', 'g4'].forEach(gid => {
-    const grp = GROUPS[gid];
-    const optgroup = document.createElement('optgroup');
-    optgroup.label = `${grp.icon} ${grp.name.toUpperCase()}`;
-
-    // Add option to select entire group
-    const grpAllOpt = document.createElement('option');
-    grpAllOpt.value = `__grp:${gid}`;
-    grpAllOpt.textContent = `👉 [Tất cả ${grp.name}]`;
-    grpAllOpt.style.fontWeight = 'bold';
-    optgroup.appendChild(grpAllOpt);
-
-    const stsList = [...groupedStatuses[gid]].sort();
-    stsList.forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s;
-      opt.textContent = s;
-      optgroup.appendChild(opt);
-    });
-    fst.appendChild(optgroup);
+    filterOptions.groupedSts[gid] = [...groupedStatuses[gid]].sort();
   });
 
-  // 4. Schedule Filter
+  // 5. Schedule
   if(S.colSch){
     const schs = [...new Set(S.all.map(r => norm(r[S.colSch] ?? '')).filter(Boolean))].sort();
-    const fsch = $('filter-schedule');
-    fsch.innerHTML = '<option value="">Tất cả</option>';
-    schs.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; fsch.appendChild(o); });
+    filterOptions.schs = schs.map(s => ({ val: s, label: s }));
+    $('group-filter-schedule').style.display = '';
+  } else {
+    filterOptions.schs = [];
+    $('group-filter-schedule').style.display = 'none';
+  }
+
+  // Render DOM items inside Modal Dropdowns
+  renderFlatWidget('dates', 'ms-trigger-date', 'ms-text-date', 'ms-list-date', 'ms-search-date', filterOptions.dates, 'Tất cả các ngày', 'ngày');
+  renderFlatWidget('srcs', 'ms-trigger-source', 'ms-text-source', 'ms-list-source', 'ms-search-source', filterOptions.srcs, 'Tất cả nhân viên', 'nhân viên');
+  if(S.colSvc){
+    renderFlatWidget('svcs', 'ms-trigger-service', 'ms-text-service', 'ms-list-service', 'ms-search-service', filterOptions.svcs, 'Tất cả dịch vụ', 'dịch vụ');
+  }
+  if(S.colSch){
+    renderFlatWidget('schs', 'ms-trigger-schedule', 'ms-text-schedule', 'ms-list-schedule', 'ms-search-schedule', filterOptions.schs, 'Tất cả lịch hẹn', 'lịch hẹn');
+  }
+  renderStatusWidget();
+
+  if(!dropdownListenersInitialized){
+    setupDropdownToggles();
+    dropdownListenersInitialized = true;
   }
 }
 
-// FILTER ROWS ACCORDING TO STATE
+// RENDER FLAT MULTI-SELECT WIDGET
+function renderFlatWidget(key, triggerId, textId, listId, searchId, options, allLabel, nounLabel){
+  const listEl = $(listId);
+  listEl.innerHTML = '';
+
+  // "Tất cả..." Special Option
+  const allItem = document.createElement('div');
+  allItem.className = 'ms-option-item is-special';
+  allItem.dataset.val = '__all__';
+  allItem.innerHTML = `<input type="checkbox" /><span class="ms-option-text">${esc(allLabel)}</span>`;
+  allItem.addEventListener('click', (e) => {
+    e.stopPropagation();
+    tempFilters[key].clear();
+    syncFlatWidget(key, textId, listId, options, allLabel, nounLabel);
+  });
+  listEl.appendChild(allItem);
+
+  // Concrete Options
+  options.forEach((opt, idx) => {
+    const item = document.createElement('div');
+    item.className = 'ms-option-item';
+    item.dataset.val = opt.val;
+    item.innerHTML = `<input type="checkbox" /><span class="ms-option-text">${esc(opt.label)}</span>`;
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if(tempFilters[key].has(opt.val)){
+        tempFilters[key].delete(opt.val);
+      } else {
+        tempFilters[key].add(opt.val);
+      }
+      syncFlatWidget(key, textId, listId, options, allLabel, nounLabel);
+    });
+    listEl.appendChild(item);
+  });
+
+  // Search input filtering
+  const searchInput = $(searchId);
+  if(searchInput){
+    searchInput.value = '';
+    searchInput.oninput = (e) => {
+      const q = nk(e.target.value);
+      listEl.querySelectorAll('.ms-option-item:not(.is-special)').forEach(it => {
+        const txt = nk(it.querySelector('.ms-option-text').textContent);
+        it.style.display = txt.includes(q) ? 'flex' : 'none';
+      });
+    };
+  }
+
+  syncFlatWidget(key, textId, listId, options, allLabel, nounLabel);
+}
+
+// SYNC STATE & LABELS FOR FLAT MULTI-SELECT
+function syncFlatWidget(key, textId, listId, options, allLabel, nounLabel){
+  const listEl = $(listId);
+  const textEl = $(textId);
+  if(!listEl || !textEl) return;
+  const selectedCount = tempFilters[key].size;
+
+  // Sync "Tất cả" Checkbox
+  const allItem = listEl.querySelector('.is-special');
+  if(allItem){
+    const isAll = (selectedCount === 0);
+    allItem.querySelector('input').checked = isAll;
+    allItem.classList.toggle('selected', isAll);
+  }
+
+  // Sync Specific Item Checkboxes
+  listEl.querySelectorAll('.ms-option-item:not(.is-special)').forEach(it => {
+    const val = it.dataset.val;
+    const isChecked = tempFilters[key].has(val);
+    const chk = it.querySelector('input');
+    if(chk) chk.checked = isChecked;
+    it.classList.toggle('selected', isChecked);
+  });
+
+  // Sync Trigger Label
+  if(selectedCount === 0){
+    textEl.textContent = allLabel;
+    textEl.className = 'ms-trigger-text is-all';
+  } else if(selectedCount === 1){
+    const firstVal = Array.from(tempFilters[key])[0];
+    const found = options.find(o => o.val === firstVal);
+    textEl.textContent = `1 ${nounLabel}: ${found ? found.val : firstVal}`;
+    textEl.className = 'ms-trigger-text is-selected';
+  } else {
+    textEl.textContent = `Đã chọn ${selectedCount} ${nounLabel}`;
+    textEl.className = 'ms-trigger-text is-selected';
+  }
+}
+
+// RENDER GROUPED STATUS WIDGET
+function renderStatusWidget(){
+  const listEl = $('ms-list-status');
+  listEl.innerHTML = '';
+
+  // "Tất cả trạng thái" Special Option
+  const allItem = document.createElement('div');
+  allItem.className = 'ms-option-item is-special';
+  allItem.dataset.val = '__all__';
+  allItem.innerHTML = `<input type="checkbox" /><span class="ms-option-text">Tất cả trạng thái (Tất cả nhóm)</span>`;
+  allItem.addEventListener('click', (e) => {
+    e.stopPropagation();
+    tempFilters.stss.clear();
+    syncStatusWidget();
+  });
+  listEl.appendChild(allItem);
+
+  // 4 Groups
+  ['g1', 'g2', 'g3', 'g4'].forEach(gid => {
+    const grp = GROUPS[gid];
+    const list = filterOptions.groupedSts[gid] || [];
+    if(!list.length) return;
+
+    // Group Header with Checkbox
+    const header = document.createElement('div');
+    header.className = 'ms-group-header';
+    header.dataset.gid = gid;
+    header.innerHTML = `
+      <label class="ms-group-check-wrap">
+        <input type="checkbox" class="ms-grp-chk" data-gid="${gid}" />
+        <span>${grp.icon} ${grp.name}</span>
+      </label>
+      <span style="font-size:10px;font-weight:700;color:${grp.badge};">${list.length} trạng thái</span>
+    `;
+
+    const grpChk = header.querySelector('.ms-grp-chk');
+    grpChk.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const allIn = list.every(s => tempFilters.stss.has(s));
+      if(allIn){
+        list.forEach(s => tempFilters.stss.delete(s));
+      } else {
+        list.forEach(s => tempFilters.stss.add(s));
+      }
+      syncStatusWidget();
+    });
+    listEl.appendChild(header);
+
+    // Child Statuses
+    list.forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'ms-option-item ms-child-item';
+      item.dataset.val = s;
+      item.dataset.gid = gid;
+      item.innerHTML = `<input type="checkbox" class="ms-sts-chk" /><span class="ms-option-text">${esc(s)}</span>`;
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if(tempFilters.stss.has(s)){
+          tempFilters.stss.delete(s);
+        } else {
+          tempFilters.stss.add(s);
+        }
+        syncStatusWidget();
+      });
+      listEl.appendChild(item);
+    });
+  });
+
+  // Search input filtering
+  const searchInput = $('ms-search-status');
+  if(searchInput){
+    searchInput.value = '';
+    searchInput.oninput = (e) => {
+      const q = nk(e.target.value);
+      const visiblePerGrp = { g1: 0, g2: 0, g3: 0, g4: 0 };
+      listEl.querySelectorAll('.ms-child-item').forEach(it => {
+        const txt = nk(it.dataset.val);
+        const isVisible = txt.includes(q);
+        it.style.display = isVisible ? 'flex' : 'none';
+        if(isVisible) visiblePerGrp[it.dataset.gid]++;
+      });
+
+      listEl.querySelectorAll('.ms-group-header').forEach(hdr => {
+        const gid = hdr.dataset.gid;
+        hdr.style.display = (visiblePerGrp[gid] > 0 || !q) ? 'flex' : 'none';
+      });
+    };
+  }
+
+  syncStatusWidget();
+}
+
+// SYNC STATE & LABELS FOR STATUS WIDGET
+function syncStatusWidget(){
+  const listEl = $('ms-list-status');
+  const textEl = $('ms-text-status');
+  if(!listEl || !textEl) return;
+  const selectedCount = tempFilters.stss.size;
+
+  // Sync "Tất cả" Checkbox
+  const allItem = listEl.querySelector('.is-special');
+  if(allItem){
+    const isAll = (selectedCount === 0);
+    allItem.querySelector('input').checked = isAll;
+    allItem.classList.toggle('selected', isAll);
+  }
+
+  // Sync Group Checkboxes
+  ['g1', 'g2', 'g3', 'g4'].forEach(gid => {
+    const list = filterOptions.groupedSts[gid] || [];
+    const grpHdr = listEl.querySelector(`.ms-group-header[data-gid="${gid}"]`);
+    if(grpHdr && list.length > 0){
+      const grpChk = grpHdr.querySelector('.ms-grp-chk');
+      const inCount = list.filter(s => tempFilters.stss.has(s)).length;
+      grpChk.checked = (inCount === list.length && list.length > 0);
+      grpChk.indeterminate = (inCount > 0 && inCount < list.length);
+    }
+  });
+
+  // Sync Child Item Checkboxes
+  listEl.querySelectorAll('.ms-child-item').forEach(it => {
+    const val = it.dataset.val;
+    const isChecked = tempFilters.stss.has(val);
+    const chk = it.querySelector('input');
+    if(chk) chk.checked = isChecked;
+    it.classList.toggle('selected', isChecked);
+  });
+
+  // Sync Trigger Label
+  if(selectedCount === 0){
+    textEl.textContent = 'Tất cả trạng thái (Tất cả nhóm)';
+    textEl.className = 'ms-trigger-text is-all';
+  } else if(selectedCount === 1){
+    const firstVal = Array.from(tempFilters.stss)[0];
+    textEl.textContent = `1 trạng thái: ${firstVal}`;
+    textEl.className = 'ms-trigger-text is-selected';
+  } else {
+    textEl.textContent = `Đã chọn ${selectedCount} trạng thái`;
+    textEl.className = 'ms-trigger-text is-selected';
+  }
+}
+
+// SETUP DROPDOWN TOGGLES AND CLICK-OUTSIDE
+function setupDropdownToggles(){
+  const widgets = [
+    { trigger: 'ms-trigger-date', widget: 'ms-widget-date', search: 'ms-search-date' },
+    { trigger: 'ms-trigger-source', widget: 'ms-widget-source', search: 'ms-search-source' },
+    { trigger: 'ms-trigger-service', widget: 'ms-widget-service', search: 'ms-search-service' },
+    { trigger: 'ms-trigger-schedule', widget: 'ms-widget-schedule', search: 'ms-search-schedule' },
+    { trigger: 'ms-trigger-status', widget: 'ms-widget-status', search: 'ms-search-status' }
+  ];
+
+  widgets.forEach(({ trigger, widget, search }) => {
+    const trgEl = $(trigger);
+    const wdgEl = $(widget);
+    if(!trgEl || !wdgEl) return;
+
+    trgEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const wasOpen = wdgEl.classList.contains('open');
+      closeAllDropdowns();
+      if(!wasOpen){
+        wdgEl.classList.add('open');
+        const sEl = $(search);
+        if(sEl) setTimeout(() => sEl.focus(), 60);
+      }
+    });
+
+    const dropEl = wdgEl.querySelector('.ms-dropdown');
+    if(dropEl){
+      dropEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if(!e.target.closest('.ms-widget')){
+      closeAllDropdowns();
+    }
+  });
+}
+
+function closeAllDropdowns(){
+  document.querySelectorAll('.ms-widget.open').forEach(w => w.classList.remove('open'));
+}
+
+// FILTER ROWS ACCORDING TO STATE (MULTI-SELECT SUPPORT)
 function getFilteredRows(){
   let rows = S.all;
 
-  // Date filter
-  if(S.fDate){
-    rows = rows.filter(r => r[S.colDate] === S.fDate);
+  // 1. Date filter (multi-select)
+  if(S.fDates && S.fDates.length > 0 && S.colDate){
+    const dSet = new Set(S.fDates);
+    rows = rows.filter(r => dSet.has(r[S.colDate]));
   }
 
-  // Quick group card filter
+  // 2. Quick group card filter
   if(S.fGroup){
     rows = rows.filter(r => r._grp === S.fGroup);
   }
 
-  // Search by employee name
-  if(S.fSearch.trim()){
+  // 3. Employee Search query
+  if(S.fSearch && S.fSearch.trim()){
     const q = nk(S.fSearch.trim());
     rows = rows.filter(r => nk(r[S.colSrc] ?? '').includes(q));
   }
 
-  // Employee dropdown
-  if(S.fSrc){
-    rows = rows.filter(r => r[S.colSrc] === S.fSrc);
+  // 4. Employee / Source multi-select
+  if(S.fSrcs && S.fSrcs.length > 0 && S.colSrc){
+    const srcSet = new Set(S.fSrcs);
+    rows = rows.filter(r => srcSet.has(r[S.colSrc]));
   }
 
-  // Service dropdown
-  if(S.fSvc && S.colSvc){
-    rows = rows.filter(r => (r[S.colSvc] ?? '') === S.fSvc);
+  // 5. Service multi-select
+  if(S.fSvcs && S.fSvcs.length > 0 && S.colSvc){
+    const svcSet = new Set(S.fSvcs);
+    rows = rows.filter(r => svcSet.has(r[S.colSvc] ?? ''));
   }
 
-  // Status dropdown
-  if(S.fSts){
-    if(S.fSts.startsWith('__grp:')){
-      const gid = S.fSts.split(':')[1];
-      rows = rows.filter(r => r._grp === gid);
-    } else {
-      rows = rows.filter(r => r[S.colSts] === S.fSts);
-    }
+  // 6. Status multi-select
+  if(S.fStss && S.fStss.length > 0 && S.colSts){
+    const stsSet = new Set(S.fStss);
+    rows = rows.filter(r => stsSet.has(r[S.colSts]));
   }
 
-  // Schedule dropdown
-  if(S.fSch && S.colSch){
-    rows = rows.filter(r => norm(r[S.colSch] ?? '') === S.fSch);
+  // 7. Schedule multi-select
+  if(S.fSchs && S.fSchs.length > 0 && S.colSch){
+    const schSet = new Set(S.fSchs);
+    rows = rows.filter(r => schSet.has(norm(r[S.colSch] ?? '')));
   }
 
   return rows;
@@ -1158,8 +1603,11 @@ function update(){
   $('card-g1-pct').textContent = pct(daDenPct);
   $('card-g1-count').textContent = fmt(daDenCount);
   $('card-g1-total-all').textContent = fmt(S.all.length);
-  $('card-active-date').textContent = S.fDate ? `Ngày ${S.fDate}` : 'Tất cả các ngày';
-  $('card-active-date-sub').textContent = S.fDate ? `${fmt(t)} khách hàng ghi nhận` : `Toàn bộ ${fmt(S.all.length)} khách`;
+  const dateTitle = S.fDates.length === 0 
+    ? 'Tất cả các ngày' 
+    : (S.fDates.length === 1 ? `Ngày ${S.fDates[0]}` : `${S.fDates.length} ngày đã chọn`);
+  $('card-active-date').textContent = dateTitle;
+  $('card-active-date-sub').textContent = S.fDates.length > 0 ? `${fmt(t)} khách hàng ghi nhận` : `Toàn bộ ${fmt(S.all.length)} khách`;
   $('card-sources').textContent = fmt(new Set(f.map(r => r[S.colSrc])).size);
 
   // Update 4 Interactive Group Cards
@@ -1192,38 +1640,114 @@ function update(){
   renderDataTable(f);
 }
 
-// ACTIVE FILTER CHIPS
+// ACTIVE FILTER CHIPS & BUTTON STATE
 function renderActiveFilters(){
   const el = $('active-filters');
   const chips = [];
+  const summaryParts = [];
+  let activeCount = 0;
 
-  if(S.fDate) chips.push({ l: `📅 Ngày ${S.fDate}`, k: 'date' });
-  if(S.fGroup) chips.push({ l: `🎯 ${GROUPS[S.fGroup].name}`, k: 'grp' });
-  if(S.fSearch) chips.push({ l: `🔎 "${S.fSearch}"`, k: 'search' });
-  if(S.fSrc) chips.push({ l: `👤 ${S.fSrc}`, k: 'src' });
-  if(S.fSvc) chips.push({ l: `🛎️ ${S.fSvc}`, k: 'svc' });
-  if(S.fSts){
-    const lbl = S.fSts.startsWith('__grp:') ? `📋 ${GROUPS[S.fSts.split(':')[1]].name}` : `📋 ${S.fSts}`;
-    chips.push({ l: lbl, k: 'sts' });
+  // 1. Dates
+  if(S.fDates && S.fDates.length > 0){
+    activeCount++;
+    summaryParts.push(`${S.fDates.length} ngày`);
+    S.fDates.forEach(d => {
+      chips.push({ l: `📅 Ngày ${d}`, k: 'date', val: d });
+    });
   }
-  if(S.fSch) chips.push({ l: `⏰ ${S.fSch}`, k: 'sch' });
 
-  if(!chips.length){ el.classList.add('hidden'); return; }
+  // 2. Employees (Sources)
+  if(S.fSrcs && S.fSrcs.length > 0){
+    activeCount++;
+    summaryParts.push(`${S.fSrcs.length} nhân viên`);
+    S.fSrcs.forEach(src => {
+      chips.push({ l: `👤 ${src}`, k: 'src', val: src });
+    });
+  }
+
+  // 3. Search query
+  if(S.fSearch && S.fSearch.trim()){
+    chips.push({ l: `🔎 "${S.fSearch.trim()}"`, k: 'search', val: S.fSearch });
+  }
+
+  // 4. Services
+  if(S.fSvcs && S.fSvcs.length > 0){
+    activeCount++;
+    summaryParts.push(`${S.fSvcs.length} dịch vụ`);
+    S.fSvcs.forEach(svc => {
+      chips.push({ l: `🛎️ ${svc}`, k: 'svc', val: svc });
+    });
+  }
+
+  // 5. Statuses
+  if(S.fStss && S.fStss.length > 0){
+    activeCount++;
+    summaryParts.push(`${S.fStss.length} trạng thái`);
+    S.fStss.forEach(sts => {
+      chips.push({ l: `📋 ${sts}`, k: 'sts', val: sts });
+    });
+  }
+
+  // 6. Schedule
+  if(S.fSchs && S.fSchs.length > 0){
+    activeCount++;
+    summaryParts.push(`${S.fSchs.length} lịch hẹn`);
+    S.fSchs.forEach(sch => {
+      chips.push({ l: `⏰ ${sch}`, k: 'sch', val: sch });
+    });
+  }
+
+  // 7. Group card filter
+  if(S.fGroup){
+    activeCount++;
+    chips.push({ l: `🎯 ${GROUPS[S.fGroup].name}`, k: 'grp', val: S.fGroup });
+  }
+
+  // Update Main Trigger Button & Summary
+  const triggerBtn = $('btn-open-filter-modal');
+  const badge = $('filter-active-count');
+  const summaryEl = $('filter-summary-text');
+  const quickResetBtn = $('btn-quick-reset');
+
+  if(activeCount > 0){
+    triggerBtn.classList.add('has-active');
+    badge.textContent = activeCount;
+    badge.classList.remove('hidden');
+    if(summaryParts.length > 0){
+      summaryEl.innerHTML = `Đang áp dụng: <strong>${esc(summaryParts.join(' • '))}</strong>`;
+    } else {
+      summaryEl.textContent = '';
+    }
+    if(quickResetBtn) quickResetBtn.classList.remove('hidden');
+  } else {
+    triggerBtn.classList.remove('has-active');
+    badge.textContent = '0';
+    badge.classList.add('hidden');
+    summaryEl.textContent = '';
+    if(quickResetBtn) quickResetBtn.classList.add('hidden');
+  }
+
+  if(!chips.length){
+    el.classList.add('hidden');
+    return;
+  }
   el.classList.remove('hidden');
-  el.innerHTML = `<span class="active-filters-label">Đang lọc:</span>` +
-    chips.map(c => `<span class="filter-badge" data-k="${c.k}">${esc(c.l)} <span>×</span></span>`).join('');
+  el.innerHTML = `<span class="active-filters-label">Đang lọc (${chips.length}):</span>` +
+    chips.map(c => `<span class="filter-badge" data-k="${c.k}" data-val="${esc(c.val || '')}" title="Click để xóa">${esc(c.l)} <span>&times;</span></span>`).join('');
 
   el.querySelectorAll('.filter-badge').forEach(b => {
     b.addEventListener('click', () => {
       const k = b.dataset.k;
-      if(k === 'date'){ S.fDate = ''; $('filter-date').value = ''; }
+      const val = b.dataset.val;
+      if(k === 'date'){ S.fDates = S.fDates.filter(x => x !== val); }
+      if(k === 'src'){ S.fSrcs = S.fSrcs.filter(x => x !== val); }
+      if(k === 'svc'){ S.fSvcs = S.fSvcs.filter(x => x !== val); }
+      if(k === 'sts'){ S.fStss = S.fStss.filter(x => x !== val); }
+      if(k === 'sch'){ S.fSchs = S.fSchs.filter(x => x !== val); }
       if(k === 'grp'){ S.fGroup = ''; }
-      if(k === 'search'){ S.fSearch = ''; $('filter-search').value = ''; }
-      if(k === 'src'){ S.fSrc = ''; $('filter-source').value = ''; }
-      if(k === 'svc'){ S.fSvc = ''; $('filter-service').value = ''; }
-      if(k === 'sts'){ S.fSts = ''; $('filter-status').value = ''; }
-      if(k === 'sch'){ S.fSch = ''; if($('filter-schedule')) $('filter-schedule').value = ''; }
-      S.page = 1; update();
+      if(k === 'search'){ S.fSearch = ''; }
+      S.page = 1;
+      update();
     });
   });
 }
@@ -1238,11 +1762,26 @@ function renderDailyBreakdown(){
 
   // Group base rows by date (respecting non-date filters like Employee)
   let baseRows = S.all;
-  if(S.fSearch.trim()){
+  if(S.fSearch && S.fSearch.trim()){
     const q = nk(S.fSearch.trim());
     baseRows = baseRows.filter(r => nk(r[S.colSrc] ?? '').includes(q));
   }
-  if(S.fSrc) baseRows = baseRows.filter(r => r[S.colSrc] === S.fSrc);
+  if(S.fSrcs && S.fSrcs.length > 0 && S.colSrc){
+    const srcSet = new Set(S.fSrcs);
+    baseRows = baseRows.filter(r => srcSet.has(r[S.colSrc]));
+  }
+  if(S.fSvcs && S.fSvcs.length > 0 && S.colSvc){
+    const svcSet = new Set(S.fSvcs);
+    baseRows = baseRows.filter(r => svcSet.has(r[S.colSvc] ?? ''));
+  }
+  if(S.fStss && S.fStss.length > 0 && S.colSts){
+    const stsSet = new Set(S.fStss);
+    baseRows = baseRows.filter(r => stsSet.has(r[S.colSts]));
+  }
+  if(S.fSchs && S.fSchs.length > 0 && S.colSch){
+    const schSet = new Set(S.fSchs);
+    baseRows = baseRows.filter(r => schSet.has(norm(r[S.colSch] ?? '')));
+  }
 
   const datesMap = {};
   baseRows.forEach(r => {
@@ -1274,7 +1813,7 @@ function renderDailyBreakdown(){
   $('daily-summary-info').textContent = `Tổng ${datesList.length} ngày ghi nhận`;
 
   tbody.innerHTML = datesList.map(item => {
-    const isCurDate = S.fDate === item.date;
+    const isCurDate = S.fDates.includes(item.date);
     const g1p = item.total > 0 ? (item.g1 / item.total * 100) : 0;
     const g2p = item.total > 0 ? (item.g2 / item.total * 100) : 0;
     const g3p = item.total > 0 ? (item.g3 / item.total * 100) : 0;
@@ -1323,12 +1862,10 @@ function renderDailyBreakdown(){
   tbody.querySelectorAll('.btn-select-date').forEach(btn => {
     btn.addEventListener('click', () => {
       const d = btn.dataset.date;
-      if(S.fDate === d){
-        S.fDate = '';
-        $('filter-date').value = '';
+      if(S.fDates.length === 1 && S.fDates[0] === d){
+        S.fDates = [];
       } else {
-        S.fDate = d;
-        $('filter-date').value = d;
+        S.fDates = [d];
       }
       S.page = 1;
       update();
@@ -1650,53 +2187,84 @@ $('btn-view-details').addEventListener('click', () => {
   update();
 });
 
-// EVENT LISTENERS: FILTERS
-let dbt;
-$('filter-search').addEventListener('input', e => {
-  clearTimeout(dbt);
-  dbt = setTimeout(() => {
-    S.fSearch = e.target.value;
-    S.fSrc = ''; $('filter-source').value = '';
-    S.page = 1; update();
-  }, 250);
-});
+// MODAL CONTROLLERS & EVENT LISTENERS
+function openFilterModal(){
+  tempFilters.dates = new Set(S.fDates);
+  tempFilters.srcs = new Set(S.fSrcs);
+  tempFilters.svcs = new Set(S.fSvcs);
+  tempFilters.stss = new Set(S.fStss);
+  tempFilters.schs = new Set(S.fSchs);
 
-$('filter-source').addEventListener('change', e => {
-  S.fSrc = e.target.value;
-  S.fSearch = ''; $('filter-search').value = '';
-  S.page = 1; update();
-});
+  // Sync widgets to current tempFilters
+  syncFlatWidget('dates', 'ms-text-date', 'ms-list-date', filterOptions.dates, 'Tất cả các ngày', 'ngày');
+  syncFlatWidget('srcs', 'ms-text-source', 'ms-list-source', filterOptions.srcs, 'Tất cả nhân viên', 'nhân viên');
+  if(S.colSvc) syncFlatWidget('svcs', 'ms-text-service', 'ms-list-service', filterOptions.svcs, 'Tất cả dịch vụ', 'dịch vụ');
+  if(S.colSch) syncFlatWidget('schs', 'ms-text-schedule', 'ms-list-schedule', filterOptions.schs, 'Tất cả', 'lịch hẹn');
+  syncStatusWidget();
 
-$('filter-service').addEventListener('change', e => {
-  S.fSvc = e.target.value;
-  S.page = 1; update();
-});
+  closeAllDropdowns();
+  const backdrop = $('filter-modal-backdrop');
+  backdrop.classList.remove('hidden');
+  requestAnimationFrame(() => backdrop.classList.add('open'));
+}
 
-$('filter-date').addEventListener('change', e => {
-  S.fDate = e.target.value;
-  S.page = 1; update();
-});
+function closeFilterModal(){
+  const backdrop = $('filter-modal-backdrop');
+  backdrop.classList.remove('open');
+  closeAllDropdowns();
+  setTimeout(() => backdrop.classList.add('hidden'), 200);
+}
 
-$('filter-status').addEventListener('change', e => {
-  S.fSts = e.target.value;
-  S.page = 1; update();
-});
-
-$('filter-schedule').addEventListener('change', e => {
-  S.fSch = e.target.value;
-  S.page = 1; update();
-});
-
-$('btn-reset-filters').addEventListener('click', () => {
-  S.fDate = ''; S.fSearch = ''; S.fSrc = ''; S.fSvc = ''; S.fSts = ''; S.fGroup = ''; S.fSch = '';
+function applyFilterModal(){
+  S.fDates = Array.from(tempFilters.dates);
+  S.fSrcs = Array.from(tempFilters.srcs);
+  S.fSvcs = Array.from(tempFilters.svcs);
+  S.fStss = Array.from(tempFilters.stss);
+  S.fSchs = Array.from(tempFilters.schs);
+  closeFilterModal();
   S.page = 1;
-  $('filter-date').value = '';
-  $('filter-search').value = '';
-  $('filter-source').value = '';
-  $('filter-service').value = '';
-  $('filter-status').value = '';
-  if($('filter-schedule')) $('filter-schedule').value = '';
   update();
+}
+
+function resetAllFilters(){
+  tempFilters.dates.clear();
+  tempFilters.srcs.clear();
+  tempFilters.svcs.clear();
+  tempFilters.stss.clear();
+  tempFilters.schs.clear();
+  S.fDates = [];
+  S.fSrcs = [];
+  S.fSvcs = [];
+  S.fStss = [];
+  S.fSchs = [];
+  S.fGroup = '';
+  S.fSearch = '';
+  closeFilterModal();
+  S.page = 1;
+  update();
+}
+
+$('btn-open-filter-modal').addEventListener('click', openFilterModal);
+$('btn-close-filter-modal').addEventListener('click', closeFilterModal);
+$('btn-modal-cancel').addEventListener('click', closeFilterModal);
+$('btn-modal-apply').addEventListener('click', applyFilterModal);
+$('btn-modal-reset').addEventListener('click', resetAllFilters);
+
+const quickReset = $('btn-quick-reset');
+if(quickReset){
+  quickReset.addEventListener('click', resetAllFilters);
+}
+
+$('filter-modal-backdrop').addEventListener('click', (e) => {
+  if(e.target === $('filter-modal-backdrop')){
+    closeFilterModal();
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && !$('filter-modal-backdrop').classList.contains('hidden')){
+    closeFilterModal();
+  }
 });
 
 $('page-size').addEventListener('change', e => {
@@ -1710,11 +2278,18 @@ $('btn-export').addEventListener('click', () => {
   const counts = { g1: 0, g2: 0, g3: 0, g4: 0 };
   f.forEach(r => { counts[r._grp]++; });
 
+  const dateLabel = S.fDates.length > 0 ? S.fDates.join(', ') : 'Tất cả các ngày';
+  const srcLabel = S.fSrcs.length > 0 ? S.fSrcs.join(', ') : (S.fSearch || 'Tất cả');
+  const svcLabel = S.fSvcs.length > 0 ? S.fSvcs.join(', ') : 'Tất cả';
+  const stsLabel = S.fStss.length > 0 ? S.fStss.join(', ') : (S.fGroup ? GROUPS[S.fGroup].name : 'Tất cả');
+
   const rows = [
     ['BÁO CÁO PHÂN TÍCH TELESALE'],
     ['Ngày xuất báo cáo', new Date().toLocaleString('vi-VN')],
-    ['Ngày lọc dữ liệu', S.fDate ? S.fDate : 'Tất cả các ngày'],
-    ['Nhân viên', S.fSrc || S.fSearch || 'Tất cả'],
+    ['Ngày lọc dữ liệu', dateLabel],
+    ['Nhân viên lọc', srcLabel],
+    ['Dịch vụ lọc', svcLabel],
+    ['Trạng thái lọc', stsLabel],
     ['Tổng số lead', f.length],
     [],
     ['--- THỐNG KÊ 4 NHÓM TRẠNG THÁI ---'],
@@ -1750,7 +2325,7 @@ $('btn-export').addEventListener('click', () => {
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url;
-  const dTag = S.fDate ? `ngay-${S.fDate.replace('/', '-')}` : 'all-dates';
+  const dTag = S.fDates.length > 0 ? `ngay-${S.fDates.join('-').replace(/\//g, '-')}` : 'all-dates';
   a.download = `bao-cao-telesale-${dTag}-${new Date().toISOString().slice(0, 10)}.csv`;
   a.click(); URL.revokeObjectURL(url);
 });
